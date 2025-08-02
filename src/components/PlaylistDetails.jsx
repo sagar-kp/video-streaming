@@ -24,12 +24,12 @@ export default function PlaylistDetails({
   const [imgSrc, setImgSrc] = useState("");
   // console.log(list)
   useEffect(() => {
-    document.title = "YouTube";
+    document.title = "Vi-Stream";
     FetchAPI(`playlists?part=snippet&id=${list}`)
       .then(({ data }) => {
         //console.log(data)
         if (data?.items) {
-          document.title = `${data?.items?.[0]?.snippet?.title} - YouTube`;
+          document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
           setPlaylist(data?.items?.[0]);
           loadImage(data?.items?.[0]?.snippet?.thumbnails?.medium?.url)
             .then((resp) => setImgSrc(resp))

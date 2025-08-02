@@ -56,10 +56,10 @@ export default function Navbar(props) {
           src={Logo}
           alt="logo"
           style={{
-            width: windowWidth < 500 ? "80px" : "110px",
+            width: windowWidth < 500 ? "80px" : "140px",
             cursor: "pointer",
-            marginTop: "10px",
-            height: windowWidth < 500 ? "18px" : "20px",
+            marginTop: windowWidth < 500 ? "2px" : "-4px",
+            height: windowWidth < 500 ? "30.5px" : "45px",
             paddingLeft: windowWidth >= 500 && "20px",
           }}
           onClick={() => {

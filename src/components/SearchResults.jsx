@@ -22,7 +22,7 @@ export default function SearchResults({
   useEffect(() => {
     if (!query) setNoResults(true);
     else {
-      document.title = `${query} - YouTube`;
+      document.title = `${query} - Vi-Stream`;
       FetchAPI(`search?part=snippet&q=${query}&order=date&maxResults=50`)
         .then(({ data }) => {
           if (data?.items) {
@@ -39,7 +39,7 @@ export default function SearchResults({
     }
   }, [query]);
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", marginTop: "60px" }}>
       <Sidebar
         navToggle={navToggle}
         selectedCategory={selectedCategory}

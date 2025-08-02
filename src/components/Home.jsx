@@ -14,7 +14,7 @@ export default function Home({
   const [objs, setObjs] = useState([]);
   //console.log(objs)
   useEffect(() => {
-    document.title = "YouTube";
+    document.title = "Vi-Stream";
     FetchAPI(
       `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`
     )

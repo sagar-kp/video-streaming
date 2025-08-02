@@ -8,6 +8,7 @@ export default function Sidebar({
   navToggle,
   setSelectedCategory,
   selectedCategory,
+  marginTopFromProps,
 }) {
   const windowWidth = useWindowWidth();
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export default function Sidebar({
         padding: "8px",
         display: windowWidth < 600 && navToggle && "none",
         backgroundColor: "white",
+        marginTop: marginTopFromProps && marginTopFromProps,
         position:
           (windowWidth < 600 || window?.location?.pathname === "/watch") &&
           "absolute",

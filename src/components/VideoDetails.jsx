@@ -213,13 +213,13 @@ export default function VideoDetails({
   const [chnlImgSrc, setChnlImgSrc] = useState("");
 
   useEffect(() => {
-    document.title = "YouTube";
+    document.title = "Vi-Stream";
     if (id) {
       FetchAPI("videos?part=contentDetails,snippet,statistics&id=" + id)
         .then(({ data }) => {
           if (data?.items) {
             setVidDetails(data?.items);
-            document.title = `${data?.items?.[0]?.snippet?.title} - YouTube`;
+            document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
             setDescLen(data?.items?.[0]?.snippet?.description?.length <= 323);
             FetchAPI(
               `channels?part=snippet,statistics&id=${data?.items[0]?.snippet?.channelId}`
@@ -287,6 +287,7 @@ export default function VideoDetails({
           >
             <Navbar navToggle={navToggle} setNavToggle={setNavToggle} />
             <Sidebar
+              marginTopFromProps="60px"
               navToggle={navToggle}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}

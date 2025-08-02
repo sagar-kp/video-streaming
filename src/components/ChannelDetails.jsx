@@ -34,7 +34,7 @@ export default function ChannelDetails({
   const [playlists, setPlaylists] = useState([]);
   const [imgSrc, setImgSrc] = useState("");
   useEffect(() => {
-    document.title = "YouTube";
+    document.title = "Vi-Stream";
     FetchAPI(`channels?part=snippet,statistics&id=${id}`)
       ?.then(({ data }) => {
         let channelData = data;
@@ -43,7 +43,7 @@ export default function ChannelDetails({
           loadImage(data?.items?.[0]?.snippet?.thumbnails?.medium?.url)
             ?.then((resp) => setImgSrc(resp))
             ?.catch(() => {});
-          document.title = `${data?.items[0]?.snippet?.title} - YouTube`;
+          document.title = `${data?.items[0]?.snippet?.title} - Vi-Stream`;
           if (data?.items[0]?.brandingSettings?.channel?.unsubscribedTrailer) {
             FetchAPI(
               "videos?part=contentDetails,snippet,statistics&id=" +
