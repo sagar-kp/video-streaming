@@ -5,39 +5,59 @@ import Sidebar from "./reusables/Sidebar";
 // import Videos from "./reusables/Card";
 import Card from "./reusables/Card";
 
-
-export default function Home({navToggle, selectedCategory, setSelectedCategory}){
+export default function Home({
+  navToggle,
+  selectedCategory,
+  setSelectedCategory,
+}) {
   // const windowWidth = useWindowWidth()
-  const [objs, setObjs] = useState([])
+  const [objs, setObjs] = useState([]);
   //console.log(objs)
-  useEffect(()=>{
-    document.title = "YouTube"
-    FetchAPI(`search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`)
-    .then(({data})=>{
-      // console.log(data)
-      if(data.items){
-        let arr1 = [], arr2 = []
-        data.items.forEach(obj=>obj.id.hasOwnProperty("videoId")?arr1.push(obj):arr2.push(obj))
-        //console.log(arr1, arr2)
-        setObjs(data.items)
-      } else setObjs([])
-    })
-    .catch(err=>{
-      // console.log(err)
-    })
-  }, [selectedCategory])
-  return <div style={{display: "flex", marginTop:"60px"}}>
-    <Sidebar navToggle={navToggle} setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory}/>
-    <div className="container" style={{}}>
-      <div className="row" >
-        {objs.map((obj)=>
-          <Card obj={obj} channelOn={true}
-            key={obj.id.hasOwnProperty("videoId")? obj.id.videoId: obj.id.hasOwnProperty("playlistId")?
-              obj.id.playlistId: obj.id.channelId
-            }
-          />    
-        )}
+  useEffect(() => {
+    document.title = "YouTube";
+    FetchAPI(
+      `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`
+    )
+      .then(({ data }) => {
+        // console.log(data)
+        if (data?.items) {
+          let arr1 = [],
+            arr2 = [];
+          data?.items.forEach((obj) =>
+            obj?.id?.hasOwnProperty("videoId")
+              ? arr1?.push(obj)
+              : arr2?.push(obj)
+          );
+
+          setObjs(data?.items);
+        } else setObjs([]);
+      })
+      .catch(() => {});
+  }, [selectedCategory]);
+  return (
+    <div style={{ display: "flex", marginTop: "60px" }}>
+      <Sidebar
+        navToggle={navToggle}
+        setSelectedCategory={setSelectedCategory}
+        selectedCategory={selectedCategory}
+      />
+      <div className="container" style={{}}>
+        <div className="row">
+          {objs.map((obj) => (
+            <Card
+              obj={obj}
+              channelOn={true}
+              key={
+                obj?.id?.hasOwnProperty("videoId")
+                  ? obj?.id?.videoId
+                  : obj?.id?.hasOwnProperty("playlistId")
+                  ? obj?.id?.playlistId
+                  : obj?.id?.channelId
+              }
+            />
+          ))}
+        </div>
       </div>
     </div>
-  </div>
+  );
 }
