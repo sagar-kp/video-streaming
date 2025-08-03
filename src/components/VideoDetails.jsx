@@ -10,6 +10,7 @@ import cookies from "js-cookie";
 import Navbar from "./Navbar";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "../context/AppContext";
+import LoadingSpinner from "./reusables/LoadingSpinner";
 
 const iStyle = { fontSize: "larger", paddingRight: "5px" };
 
@@ -208,12 +209,15 @@ export default function VideoDetails() {
   const windowWidth = useWindowWidth();
   const navigate = useNavigate();
   const [chnlImgSrc, setChnlImgSrc] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     document.title = "Vi-Stream";
     if (id) {
+      setLoading(true);
       FetchAPI("videos?part=contentDetails,snippet,statistics&id=" + id)
         .then(({ data }) => {
+          setLoading(false);
           if (data?.items) {
             setVidDetails(data?.items);
             document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
@@ -232,19 +236,22 @@ export default function VideoDetails() {
                   .catch(() => {});
               })
               .catch(() => {});
-            FetchAPI(
-              `search?part=id,snippet&type=video&relatedToVideo=${data?.items?.[0]?.snippet?.title}&maxResults=100`
-            )
-              .then((respns) => {
-                setSuggestedVids(
-                  respns?.data?.items ? respns?.data?.items : []
-                );
-              })
-              .catch(() => {});
+
+            // API deprecated
+            // FetchAPI(
+            //   `search?part=id,snippet&type=video&relatedToVideo=${data?.items?.[0]?.snippet?.title}&maxResults=100`
+            // )
+            //   .then((respns) => {
+            //     setSuggestedVids(
+            //       respns?.data?.items ? respns?.data?.items : []
+            //     );
+            //   })
+            //   .catch(() => {});
           }
         })
         .catch(() => {
           setNoVidFound(true);
+          setLoading(false);
         });
       const getComments = () => {
         FetchAPI(`commentThreads?part=snippet&videoId=${id}&maxResults=100`)
@@ -287,7 +294,9 @@ export default function VideoDetails() {
           </div>
         </div>
       )}
-      {noVidFound ? (
+      {loading ? (
+        <LoadingSpinner />
+      ) : noVidFound ? (
         <div
           style={{
             display: "flex",

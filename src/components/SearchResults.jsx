@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useWindowWidth, SetTimePassed } from "../utils/MyHooks";
 import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
+import LoadingSpinner from "./reusables/LoadingSpinner";
 
 export default function SearchResults() {
   const [objs, setObjs] = useState([]);
@@ -15,12 +16,15 @@ export default function SearchResults() {
   const { t } = useTranslation();
   const [noResults, setNoResults] = useState(false);
   const query = searchParams.get("query");
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!query) setNoResults(true);
     else {
       document.title = `${query} - Vi-Stream`;
+      setLoading(true);
       FetchAPI(`search?part=snippet&q=${query}&order=date&maxResults=50`)
         .then(({ data }) => {
+          setLoading(false);
           if (data?.items) {
             setNoResults(false);
             // let arr = data?.items.filter(obj=>obj.id.hasOwnProperty("videoId"))
@@ -31,13 +35,17 @@ export default function SearchResults() {
             setNoResults(true);
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          setLoading(false);
+        });
     }
   }, [query]);
   return (
     <div style={{ display: "flex", marginTop: "60px" }}>
       <Sidebar />
-      {noResults ? (
+      {loading ? (
+        <LoadingSpinner />
+      ) : noResults ? (
         <div
           style={{
             display: "flex",
