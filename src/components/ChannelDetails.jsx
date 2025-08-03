@@ -11,11 +11,7 @@ import { useTranslation } from "react-i18next";
 import cookies from "js-cookie";
 import { SetTimePassed } from "../utils/MyHooks";
 
-export default function ChannelDetails({
-  navToggle,
-  selectedCategory,
-  setSelectedCategory,
-}) {
+export default function ChannelDetails() {
   let [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const { t } = useTranslation();
@@ -109,11 +105,7 @@ export default function ChannelDetails({
   }, [channel]);
   return (
     <div style={{ display: "flex", marginTop: "60px" }}>
-      <Sidebar
-        navToggle={navToggle}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
+      <Sidebar />
       <div style={{ flex: "90%" }}>
         <div>
           {channel?.brandingSettings?.image?.bannerExternalUrl && (

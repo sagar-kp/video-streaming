@@ -6,11 +6,7 @@ import { useWindowWidth, SetTimePassed } from "../utils/MyHooks";
 import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 
-export default function SearchResults({
-  navToggle,
-  setSelectedCategory,
-  selectedCategory,
-}) {
+export default function SearchResults() {
   const [objs, setObjs] = useState([]);
   const [searchParams] = useSearchParams();
   const windowWidth = useWindowWidth();
@@ -40,11 +36,7 @@ export default function SearchResults({
   }, [query]);
   return (
     <div style={{ display: "flex", marginTop: "60px" }}>
-      <Sidebar
-        navToggle={navToggle}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
+      <Sidebar />
       {noResults ? (
         <div
           style={{

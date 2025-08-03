@@ -9,6 +9,7 @@ import Sidebar from "./reusables/Sidebar";
 import cookies from "js-cookie";
 import Navbar from "./Navbar";
 import { useTranslation } from "react-i18next";
+import { useAppContext } from "../context/AppContext";
 
 const iStyle = { fontSize: "larger", paddingRight: "5px" };
 
@@ -190,12 +191,8 @@ const Comment = ({ obj }) => {
   );
 };
 
-export default function VideoDetails({
-  navToggle,
-  setNavToggle,
-  setSelectedCategory,
-  selectedCategory,
-}) {
+export default function VideoDetails() {
+  const { navToggle, setNavToggle } = useAppContext();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("v");
   const currLangCode = cookies.get("i18next") || "en";
@@ -285,13 +282,8 @@ export default function VideoDetails({
                 : "over"
             }
           >
-            <Navbar navToggle={navToggle} setNavToggle={setNavToggle} />
-            <Sidebar
-              marginTopFromProps="60px"
-              navToggle={navToggle}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
+            <Navbar />
+            <Sidebar marginTopFromProps="60px" />
           </div>
         </div>
       )}

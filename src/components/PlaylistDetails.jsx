@@ -8,11 +8,7 @@ import { useTranslation } from "react-i18next";
 import cookies from "js-cookie";
 import { loadImage } from "../utils/myFunctions";
 
-export default function PlaylistDetails({
-  navToggle,
-  selectedCategory,
-  setSelectedCategory,
-}) {
+export default function PlaylistDetails() {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const currLangCode = cookies.get("i18next") || "en";
@@ -61,11 +57,7 @@ export default function PlaylistDetails({
   }, [list]);
   return (
     <div style={{ display: "flex", marginTop: "60px" }}>
-      <Sidebar
-        navToggle={navToggle}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
+      <Sidebar />
       <div style={{ display: windowWidth > 1080 && "flex" }}>
         <div
           style={{

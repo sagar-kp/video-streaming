@@ -3,13 +3,10 @@ import { explore } from "../../assets";
 import { useWindowWidth } from "../../utils/MyHooks";
 import "../components.css";
 import { useTranslation } from "react-i18next";
+import { useAppContext } from "../../context/AppContext";
 
-export default function Sidebar({
-  navToggle,
-  setSelectedCategory,
-  selectedCategory,
-  marginTopFromProps,
-}) {
+export default function Sidebar({ marginTopFromProps }) {
+  const { navToggle, selectedCategory, setSelectedCategory } = useAppContext();
   const windowWidth = useWindowWidth();
   const { t } = useTranslation();
   const navigate = useNavigate();
