@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export default function ProgressBar() {
@@ -28,6 +28,7 @@ export default function ProgressBar() {
         width: "100%",
         height: "4px",
         overflow: "hidden",
+        zIndex: 11,
       }}
     >
       <div
