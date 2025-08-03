@@ -4,13 +4,11 @@ import { FetchAPI } from "../utils/apiCalls";
 import Sidebar from "./reusables/Sidebar";
 // import Videos from "./reusables/Card";
 import Card from "./reusables/Card";
+import { useAppContext } from "../context/AppContext";
 
-export default function Home({
-  navToggle,
-  selectedCategory,
-  setSelectedCategory,
-}) {
+export default function Home() {
   // const windowWidth = useWindowWidth()
+  const { selectedCategory } = useAppContext();
   const [objs, setObjs] = useState([]);
   //console.log(objs)
   useEffect(() => {
@@ -36,11 +34,7 @@ export default function Home({
   }, [selectedCategory]);
   return (
     <div style={{ display: "flex", marginTop: "60px" }}>
-      <Sidebar
-        navToggle={navToggle}
-        setSelectedCategory={setSelectedCategory}
-        selectedCategory={selectedCategory}
-      />
+      <Sidebar />
       <div className="container" style={{}}>
         <div className="row">
           {objs.map((obj) => (

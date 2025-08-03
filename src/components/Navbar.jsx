@@ -6,6 +6,7 @@ import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import { useWindowWidth } from "../utils/MyHooks";
 import ProgressBar from "./ProgressBar";
+import { useAppContext } from "../context/AppContext";
 
 const langCodes = {
   en: "English",
@@ -13,8 +14,8 @@ const langCodes = {
   hi: "हिन्दी",
 };
 
-export default function Navbar(props) {
-  const { setNavToggle } = props;
+export default function Navbar() {
+  const { setNavToggle } = useAppContext();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const windowWidth = useWindowWidth();
