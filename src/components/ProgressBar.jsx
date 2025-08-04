@@ -21,18 +21,17 @@ export default function ProgressBar() {
 
   return (
     <div
+      className={`position-absolute top-0 w-100 overflow-hidden ${
+        percent > 98 ? "d-none" : ""
+      }`}
       style={{
-        position: "absolute",
-        top: 0,
-        display: percent > 98 && "none",
-        width: "100%",
         height: "4px",
-        overflow: "hidden",
         zIndex: 11,
       }}
     >
       <div
-        style={{ backgroundColor: "red", width: `${percent}%`, height: "2px" }}
+        className="bg-danger"
+        style={{ width: `${percent}%`, height: "2px" }}
       />
     </div>
   );

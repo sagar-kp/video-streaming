@@ -35,13 +35,9 @@ export default function Navbar() {
     <>
       {count > 1 && window?.location?.pathname !== "/" && <ProgressBar />}
       <div
+        className="d-flex position-fixed top-0 w-100 bg-white"
         style={{
-          display: "flex",
-          backgroundColor: "white",
           padding: "0.7%",
-          position: "fixed",
-          width: "100%",
-          top: 0,
           zIndex: "10",
         }}
       >
@@ -54,11 +50,11 @@ export default function Navbar() {
           }}
         ></i>
         <img
+          className="cursor-pointer"
           src={Logo}
           alt="logo"
           style={{
             width: windowWidth < 500 ? "80px" : "140px",
-            cursor: "pointer",
             marginTop: windowWidth < 500 ? "2px" : "-4px",
             height: windowWidth < 500 ? "30.5px" : "45px",
             paddingLeft: windowWidth >= 500 && "20px",
@@ -69,9 +65,9 @@ export default function Navbar() {
           }}
         />
         <div
+          className="d-flex"
           style={{
             width: windowWidth < 500 ? "90%" : "50%",
-            display: "flex",
             border: "1px black solid",
             borderRadius: "30px",
             marginLeft: windowWidth < 500 ? "5px" : "50px",
@@ -81,12 +77,13 @@ export default function Navbar() {
           }}
         >
           <input
+            className="border-0"
             style={{
               width: windowWidth < 500 ? "85%" : "90%",
-              border: "none",
               borderStartStartRadius: "30px",
               borderEndStartRadius: "30px",
               paddingLeft: "20px",
+              outline: "none",
             }}
             placeholder={t("search", "Search")}
             value={ipVal}
@@ -97,9 +94,9 @@ export default function Navbar() {
             }}
           />
           <button
+            className="border-0"
             style={{
               width: windowWidth < 500 ? "15%" : "10%",
-              border: "none",
               borderEndEndRadius: "30px",
               borderStartEndRadius: "30px",
             }}
@@ -112,8 +109,8 @@ export default function Navbar() {
         </div>
         <div style={{ width: "15%", marginLeft: "2%", marginTop: "0.35%" }}>
           <i
-            className="bi bi-translate"
-            style={{ cursor: "pointer", fontSize: "large" }}
+            className="bi bi-translate cursor-pointer"
+            style={{ fontSize: "large" }}
             onClick={() => setOpen(!open)}
           ></i>
           {open && (
@@ -122,21 +119,16 @@ export default function Navbar() {
               style={{ right: windowWidth < 950 ? "15%" : "25%" }}
             >
               <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  margin: "2% 0%",
-                }}
+                className="d-flex align-items-center"
+                style={{ margin: "2% 0%" }}
               >
                 <i
-                  className="bi bi-arrow-left"
+                  className="bi bi-arrow-left cursor-pointer rounded-circle"
                   onClick={() => setOpen(false)}
                   style={{
                     padding: "0% 2%",
-                    borderRadius: "50%",
                     fontSize: "x-large",
                     margin: "0% 5%",
-                    cursor: "pointer",
                   }}
                 ></i>
                 {t("chsLang", "Choose Your Language")}
@@ -145,19 +137,18 @@ export default function Navbar() {
               <ul style={{ margin: "3% 0%" }}>
                 {Object?.keys(langCodes)?.map((objKey) => (
                   <li
+                    className="cursor-pointer list-unstyled"
                     key={objKey}
                     style={{
-                      listStyleType: "none",
                       marginLeft: "-30px",
-                      cursor: "pointer",
                     }}
                     onClick={() => {
                       i18next?.changeLanguage(objKey);
                       setOpen(false);
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <div style={{ flex: "20%", textAlign: "center" }}>
+                    <div className="d-flex align-items-center">
+                      <div className="text-center" style={{ flex: "20%" }}>
                         {
                           <i
                             style={{

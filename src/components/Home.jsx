@@ -18,7 +18,6 @@ export default function Home() {
       `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`
     )
       .then(({ data }) => {
-        setLoading(false);
         if (data?.items) {
           let arr1 = [],
             arr2 = [];
@@ -30,6 +29,7 @@ export default function Home() {
 
           setObjs(data?.items);
         } else setObjs([]);
+        setLoading(false);
       })
       .catch(() => {
         setLoading(false);
@@ -41,7 +41,7 @@ export default function Home() {
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <div className="container" style={{}}>
+        <div className="container">
           <div className="row">
             {objs.map((obj) => (
               <Card
