@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import cookies from "js-cookie";
 import { loadImage } from "../utils/myFunctions";
 import LoadingSpinner from "./reusables/LoadingSpinner";
+import { Loading } from "../assets";
 
 export default function PlaylistDetails() {
   const [searchParams] = useSearchParams();
@@ -26,7 +27,6 @@ export default function PlaylistDetails() {
     setLoading(true);
     FetchAPI(`playlists?part=snippet&id=${list}`)
       .then(({ data }) => {
-        setLoading(false);
         if (data?.items) {
           document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
           setPlaylist(data?.items?.[0]);
@@ -34,6 +34,7 @@ export default function PlaylistDetails() {
             .then((resp) => setImgSrc(resp))
             .catch(() => {});
         }
+        setLoading(false);
       })
       .catch(() => {
         setLoading(false);
@@ -61,13 +62,14 @@ export default function PlaylistDetails() {
       .catch(() => {});
   }, [list]);
   return (
-    <div style={{ display: "flex", marginTop: "60px" }}>
+    <div className="d-flex" style={{ marginTop: "60px" }}>
       <Sidebar />
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <div style={{ display: windowWidth > 1080 && "flex" }}>
+        <div className={windowWidth > 1080 ? "d-flex" : ""}>
           <div
+            className={`text-white`}
             style={{
               flex: windowWidth > 1080 && "30%",
               height: windowWidth > 1080 && "75vh",
@@ -75,10 +77,9 @@ export default function PlaylistDetails() {
               borderRadius: "17px",
               marginTop: "2%",
               backgroundColor: "rgb(48, 17, 114)",
-              color: "white",
             }}
           >
-            <img style={{ borderRadius: "11px" }} src={imgSrc} />
+            <img style={{ borderRadius: "11px" }} src={imgSrc ?? Loading} />
             <div
               style={{
                 fontSize: "x-large",
@@ -89,16 +90,16 @@ export default function PlaylistDetails() {
               {playlist?.snippet?.title}
             </div>
             <div
+              className="fw-bold"
               style={{
                 fontSize: "small",
-                fontWeight: "bold",
                 marginTop: "3.5%",
               }}
             >
               {playlist?.snippet?.channelTitle}
             </div>
             {playlistVids?.length > 0 && (
-              <div style={{ display: "flex", fontSize: "11.5px" }}>
+              <div className="d-flex" style={{ fontSize: "11.5px" }}>
                 {playlistVids?.length} {t("videos", "videos")} &nbsp;{" "}
                 {updated && (
                   <span>{`${currLangCode === "hi" ? updated : ""} ${t(

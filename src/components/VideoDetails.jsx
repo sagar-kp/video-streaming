@@ -4,7 +4,7 @@ import { FetchAPI } from "../utils/apiCalls";
 import { useWindowWidth, SetTimePassed } from "../utils/MyHooks";
 import ReactPlayer from "react-player";
 import { loadImage, roundSubsAndLikes } from "../utils/myFunctions";
-import { unavailableVideo } from "../assets";
+import { Loading, notFound, unavailableVideo } from "../assets";
 import Sidebar from "./reusables/Sidebar";
 import cookies from "js-cookie";
 import Navbar from "./Navbar";
@@ -24,24 +24,22 @@ export const VideoCard = ({ det: { obj, idx } }) => {
   useEffect(() => {
     loadImage(obj?.snippet?.thumbnails?.medium?.url)
       .then((resp) => setImgSrc(resp))
-      .catch(() => {});
+      .catch(() => setImgSrc(notFound));
   }, [obj]);
   return (
     <div
+      className="d-flex"
       key={obj?.id?.videoId}
       style={{
-        display: "flex",
         padding: !pathname && "1%",
         margin: pathname && "14px 0px",
       }}
     >
       {pathname && (
         <div
+          className="d-flex align-items-center text-center"
           style={{
-            display: "flex",
-            alignItems: "center",
             flex: windowWidth < 600 && "0.1%",
-            textAlign: "center",
             margin: "0% 1%",
           }}
         >
@@ -49,7 +47,7 @@ export const VideoCard = ({ det: { obj, idx } }) => {
         </div>
       )}
       <img
-        src={imgSrc}
+        src={imgSrc ?? Loading}
         alt="thumbnails"
         style={{
           width: pathname
@@ -67,11 +65,11 @@ export const VideoCard = ({ det: { obj, idx } }) => {
           )
         }
       />
-      <div style={{ display: "flex", flex: "60%", paddingLeft: "5px" }}>
+      <div className="d-flex" style={{ flex: "60%", paddingLeft: "5px" }}>
         <div>
           <div
-            className="videos-title"
-            style={{ cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}
+            className="videos-title fw-bold cursor-pointer"
+            style={{ fontSize: "14px" }}
             onClick={() =>
               navigate(
                 pathname
@@ -82,10 +80,10 @@ export const VideoCard = ({ det: { obj, idx } }) => {
           >
             {obj?.snippet?.title}
           </div>
-          <div style={{ display: pathname && "flex", color: "gray" }}>
+          <div className={`text-secondary ${pathname ? "d-flex" : ""}`}>
             <div
+              className="cursor-pointer"
               style={{
-                cursor: "pointer",
                 fontSize: "12.8px",
                 paddingTop: "3px",
               }}
@@ -96,7 +94,7 @@ export const VideoCard = ({ det: { obj, idx } }) => {
               {obj?.snippet?.channelTitle}
             </div>
             {pathname && (
-              <span style={{ marginTop: "-5px", fontWeight: "bold" }}>
+              <span className="fw-bold" style={{ marginTop: "-5px" }}>
                 &nbsp;.&nbsp;
               </span>
             )}
@@ -121,22 +119,21 @@ const Comment = ({ obj }) => {
   const [len] = useState(obj?.textOriginal?.length > 485);
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ display: "flex", marginBottom: "12px" }}>
+    <div className="d-flex" style={{ marginBottom: "12px" }}>
       <img
+        className="cursor-pointer rounded-circle"
         src={obj?.authorProfileImageUrl}
         style={{
-          borderRadius: "50%",
           width: "40px",
           height: "40px",
           marginRight: "10px",
-          cursor: "pointer",
         }}
         onClick={() => navigate(`/channels?id=${obj?.authorChannelId?.value}`)}
       />
       <div style={{ fontSize: "small" }}>
         <div>
           <span
-            style={{ fontWeight: "bold", cursor: "pointer" }}
+            className="fw-bold cursor-pointer"
             onClick={() =>
               navigate(`/channels?id=${obj?.authorChannelId?.value}`)
             }
@@ -151,33 +148,27 @@ const Comment = ({ obj }) => {
           </span>
         </div>
         <div
+          className="overflow-hidden"
           style={{
             marginTop: "5px",
             lineHeight: "19.5px",
             height: len && !open && "80px",
-            overflow: "hidden",
           }}
         >
           {obj?.textOriginal}
         </div>
         <button
-          style={{
-            display: (!len || !open) && "none",
-            border: "none",
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-          }}
+          className={`bg-transparent fw-bold border-0 ${
+            !len || !open ? "d-none" : ""
+          }`}
           onClick={() => setOpen(false)}
         >
           {t("showLess", "Show less")}
         </button>
         <button
-          style={{
-            display: (!len || open) && "none",
-            border: "none",
-            backgroundColor: "transparent",
-            fontWeight: "bold",
-          }}
+          className={`bg-transparent fw-bold border-0 ${
+            !len || open ? "d-none" : ""
+          }`}
           onClick={() => setOpen(true)}
         >
           ... {t("more", "more")}
@@ -217,7 +208,6 @@ export default function VideoDetails() {
       setLoading(true);
       FetchAPI("videos?part=contentDetails,snippet,statistics&id=" + id)
         .then(({ data }) => {
-          setLoading(false);
           if (data?.items) {
             setVidDetails(data?.items);
             document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
@@ -248,6 +238,7 @@ export default function VideoDetails() {
             //   })
             //   .catch(() => {});
           }
+          setLoading(false);
         })
         .catch(() => {
           setNoVidFound(true);
@@ -298,22 +289,14 @@ export default function VideoDetails() {
         <LoadingSpinner />
       ) : noVidFound ? (
         <div
+          className="d-flex justify-content-center align-items-center"
           style={{
-            display: "flex",
             height: "85vh",
-            justifyContent: "center",
             fontSize: "x-large",
-            alignItems: "center",
             marginTop: "60px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+          <div className="d-flex align-items-center flex-column">
             <img
               src={unavailableVideo}
               alt="unavailable video"
@@ -322,14 +305,13 @@ export default function VideoDetails() {
             {t("vidAvblMore", "This video isn't available anymore")}
             <br />
             <button
+              className="fw-bold bg-transparent"
               onClick={() => navigate("/")}
               style={{
                 border: "0.5px solid lightgray",
                 borderRadius: "19px",
                 fontSize: "small",
-                backgroundColor: "transparent",
                 color: "#1e85dd",
-                fontWeight: "bold",
                 padding: "7px 15px",
                 marginTop: "37px",
               }}
@@ -340,9 +322,10 @@ export default function VideoDetails() {
         </div>
       ) : (
         <div
+          className={`d-flex ${
+            windowWidth < 1000 ? "flex-column" : "flex-row"
+          }`}
           style={{
-            display: "flex",
-            flexDirection: windowWidth < 1000 ? "column" : "row",
             marginTop: "60px",
           }}
         >
@@ -368,24 +351,23 @@ export default function VideoDetails() {
             {vidDetails?.length > 0 && (
               <div>
                 <div
+                  className="fw-bold"
                   style={{
-                    fontWeight: "bold",
                     paddingTop: "10px",
                     fontSize: "large",
                   }}
                 >
                   {vidDetails?.[0]?.snippet?.title}
                 </div>
-                <div style={{ display: "flex", padding: "2px 0px 10px" }}>
+                <div className="d-flex" style={{ padding: "2px 0px 10px" }}>
                   <img
+                    className="cursor-pointer rounded-circle"
                     src={chnlImgSrc}
                     alt="logo"
                     style={{
-                      borderRadius: "50%",
                       width: "40px",
                       height: "40px",
                       marginRight: "10px",
-                      cursor: "pointer",
                     }}
                     onClick={() =>
                       navigate(
@@ -395,10 +377,9 @@ export default function VideoDetails() {
                   />
                   <div>
                     <div
+                      className="fw-bold cursor-pointer"
                       style={{
-                        fontWeight: "bold",
                         marginBottom: "-5px",
-                        cursor: "pointer",
                       }}
                       onClick={() =>
                         navigate(
@@ -416,12 +397,11 @@ export default function VideoDetails() {
                     )}
                   </div>
                   <div
+                    className="d-flex fw-bold"
                     style={{
                       marginBottom: "2px",
                       marginLeft: windowWidth < 900 ? "2%" : "40%",
-                      display: "flex",
                       padding: "5px 17px",
-                      fontWeight: "bold",
                       borderRadius: "60px",
                       backgroundColor: "rgb(242, 242, 242)",
                     }}
@@ -436,11 +416,11 @@ export default function VideoDetails() {
                         : vidDetails?.[0]?.statistics?.likeCount}
                     </span>
                     <span
+                      className="fw-normal"
                       style={{
                         fontSize: "20px",
                         marginTop: "-9px",
                         padding: "5%",
-                        fontWeight: "normal",
                       }}
                     >
                       |
@@ -456,14 +436,14 @@ export default function VideoDetails() {
                   }}
                 >
                   <div
+                    className="overflow-hidden"
                     style={{
                       fontSize: "14px",
                       lineHeight: "19px",
                       height: !descOpen && "79px",
-                      overflow: "hidden",
                     }}
                   >
-                    <span style={{ fontWeight: "bold" }}>
+                    <span className="fw-bold">
                       {parseInt(
                         vidDetails?.[0]?.statistics?.viewCount
                       )?.toLocaleString()}{" "}
@@ -485,24 +465,18 @@ export default function VideoDetails() {
                     <br />
                     <br />
                     <button
-                      style={{
-                        display: (descLen || !descOpen) && "none",
-                        border: "none",
-                        backgroundColor: "transparent",
-                        fontWeight: "bold",
-                      }}
+                      className={`bg-transparent fw-bold border-0 ${
+                        descLen || !descOpen ? "d-none" : ""
+                      } `}
                       onClick={() => setDescOpen(false)}
                     >
                       {t("showLess", "Show less")}
                     </button>
                   </div>
                   <button
-                    style={{
-                      display: (descLen || descOpen) && "none",
-                      border: "none",
-                      backgroundColor: "transparent",
-                      fontWeight: "bold",
-                    }}
+                    className={`bg-transparent fw-bold border-0 ${
+                      descLen || descOpen ? "d-none" : ""
+                    }`}
                     onClick={() => setDescOpen(true)}
                   >
                     ... {t("more", "more")}

@@ -4,16 +4,17 @@ import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 import { loadImage } from "../../utils/myFunctions";
 import { useEffect, useState } from "react";
+import { Loading, notFound } from "../../assets";
 
 export default function Card({ obj, channelOn }) {
   const navigate = useNavigate();
-  const [imgSrc, setImgSrc] = useState("");
+  const [imgSrc, setImgSrc] = useState(null);
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
   useEffect(() => {
-    loadImage(obj?.snippet?.thumbnails?.medium.url)
+    loadImage(obj?.snippet?.thumbnails?.medium?.url)
       .then((resp) => setImgSrc(resp))
-      .catch(() => {});
+      .catch(() => setImgSrc(notFound));
   }, [obj]);
   return (
     <div
@@ -28,12 +29,12 @@ export default function Card({ obj, channelOn }) {
         channelOn ? "4" : "3"
       } col-sm-6 col-xs-6 col-xxs-12 p-2`}
     >
-      <div style={{ textAlign: obj?.id?.channelId && "center" }}>
+      <div className={`${obj?.id?.channelId ? "text-center" : ""}`}>
         <img
-          src={imgSrc}
+          className="cursor-pointer"
+          src={imgSrc ?? Loading}
           alt="thumbnails"
           style={{
-            cursor: "pointer",
             maxInlineSize: "100%",
             width: obj?.id?.channelId ? "45%" : "100%",
             margin: obj?.id?.channelId && "5%",
@@ -52,14 +53,13 @@ export default function Card({ obj, channelOn }) {
         />
       </div>
       <div
-        className="videos-title"
+        className={`videos-title fw-bold cursor-pointer ${
+          obj?.id?.channelId ? "text-center" : ""
+        }`}
         style={{
-          cursor: "pointer",
           padding: "2.9% 0% 0.1%",
-          fontWeight: "bold",
           fontSize:
             window?.location?.pathname === "/channels" ? "14px" : "16px",
-          textAlign: obj?.id?.channelId && "center",
         }}
         onClick={() => {
           navigate(
@@ -75,9 +75,10 @@ export default function Card({ obj, channelOn }) {
       </div>
       {channelOn && (
         <div
-          className={obj?.id?.channelId ? "videos-title" : "over"}
+          className={`cursor-pointer ${
+            obj?.id?.channelId ? "videos-title" : "over"
+          }`}
           style={{
-            cursor: "pointer",
             fontSize:
               window?.location?.pathname === "/channels" ? "small" : "14.4px",
           }}
@@ -90,7 +91,8 @@ export default function Card({ obj, channelOn }) {
       )}
       {obj?.id?.playlistId && (
         <div
-          style={{ cursor: "pointer", fontSize: "14.4px" }}
+          className="cursor-pointer"
+          style={{ fontSize: "14.4px" }}
           onClick={() => navigate(`/playlist?list=${obj?.id?.playlistId}`)}
         >
           {window?.location?.pathname === "/channels"

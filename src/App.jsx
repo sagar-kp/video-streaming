@@ -23,13 +23,7 @@ function App() {
           <Route
             path="*"
             element={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <div className="d-flex justify-content-center align-items-center">
                 This page isn't available. Sorry about that.
               </div>
             }

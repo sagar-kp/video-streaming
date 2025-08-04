@@ -20,6 +20,7 @@ const loadImg = (imageUrl) => {
       resolve(img?.height < 150 ? notFound : String(imageUrl));
     };
     img.onerror = () => {
+      resolve(notFound);
       // reject;
     };
   });

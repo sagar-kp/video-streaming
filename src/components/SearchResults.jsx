@@ -24,7 +24,6 @@ export default function SearchResults() {
       setLoading(true);
       FetchAPI(`search?part=snippet&q=${query}&order=date&maxResults=50`)
         .then(({ data }) => {
-          setLoading(false);
           if (data?.items) {
             setNoResults(false);
             // let arr = data?.items.filter(obj=>obj.id.hasOwnProperty("videoId"))
@@ -34,6 +33,7 @@ export default function SearchResults() {
           } else {
             setNoResults(true);
           }
+          setLoading(false);
         })
         .catch(() => {
           setLoading(false);
@@ -41,16 +41,15 @@ export default function SearchResults() {
     }
   }, [query]);
   return (
-    <div style={{ display: "flex", marginTop: "60px" }}>
+    <div className="d-flex" style={{ marginTop: "60px" }}>
       <Sidebar />
       {loading ? (
         <LoadingSpinner />
       ) : noResults ? (
         <div
+          className="d-flex justify-content-center"
           style={{
-            display: "flex",
             flex: "100%",
-            justifyContent: "center",
             paddingTop: "6%",
           }}
         >
@@ -60,15 +59,15 @@ export default function SearchResults() {
         <div style={{ margin: "2% 0% 0% 3%" }}>
           {objs.map((obj, index) => (
             <div
+              className="d-flex"
               key={index}
               style={{
-                display: "flex",
                 marginBottom: windowWidth < 700 && "5%",
               }}
             >
               <div
-                className="search-img_div"
-                style={{ flex: "30%", textAlign: "center" }}
+                className="search-img_div text-center"
+                style={{ flex: "30%" }}
               >
                 <img
                   className="search-img"
@@ -92,11 +91,10 @@ export default function SearchResults() {
               </div>
               <div style={{ flex: "70%" }}>
                 <div
-                  className="videos-title"
+                  className="videos-title cursor-pointer"
                   style={{
                     padding:
                       windowWidth < 750 ? "0.2% 2% 0.1%" : "2.9% 2% 0.1%",
-                    cursor: "pointer",
                     fontSize: windowWidth < 750 ? "15px" : "19px",
                     lineHeight: windowWidth < 750 && "17px",
                   }}
@@ -123,10 +121,9 @@ export default function SearchResults() {
                 )}
                 {!obj?.id?.hasOwnProperty("channelId") && (
                   <div
+                    className="fw-bold cursor-pointer"
                     style={{
                       padding: "0.1% 2% 0%",
-                      cursor: "pointer",
-                      fontWeight: "bold",
                       fontSize: "small",
                     }}
                     onClick={() =>
@@ -138,10 +135,9 @@ export default function SearchResults() {
                 )}
                 {obj?.id?.playlistId && (
                   <div
+                    className="fw-bold cursor-pointer"
                     style={{
                       padding: "0.1% 2% 0%",
-                      cursor: "pointer",
-                      fontWeight: "bold",
                       fontSize: "small",
                     }}
                     onClick={() =>
@@ -153,10 +149,9 @@ export default function SearchResults() {
                 )}
                 {obj?.id?.hasOwnProperty("channelId") && (
                   <div
-                    className="videos-title"
+                    className="videos-title fw-normal"
                     style={{
                       padding: "0.1% 2% 0%",
-                      fontWeight: "normal",
                       fontSize: "small",
                     }}
                   >

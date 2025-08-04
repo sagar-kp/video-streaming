@@ -12,25 +12,24 @@ export default function Sidebar({ marginTopFromProps }) {
   const navigate = useNavigate();
   return (
     <div
+      className={`bg-white zindex-2 ${
+        windowWidth < 600 || window?.location?.pathname === "/watch"
+          ? "position-absolute"
+          : ""
+      } ${windowWidth < 600 && navToggle ? "d-none" : ""}`}
       style={{
         padding: "8px",
-        display: windowWidth < 600 && navToggle && "none",
-        backgroundColor: "white",
         marginTop: marginTopFromProps && marginTopFromProps,
-        position:
-          (windowWidth < 600 || window?.location?.pathname === "/watch") &&
-          "absolute",
-        zIndex: "2",
       }}
     >
       <span
+        className={`${
+          (windowWidth >= 600 && navToggle) || (windowWidth < 600 && !navToggle)
+            ? "d-block"
+            : "d-none"
+        }`}
         style={{
           fontSize: "19px",
-          display:
-            (windowWidth >= 600 && navToggle) ||
-            (windowWidth < 600 && !navToggle)
-              ? "block"
-              : "none",
           paddingLeft: "8px",
         }}
       >
@@ -38,7 +37,21 @@ export default function Sidebar({ marginTopFromProps }) {
       </span>
       {explore.map((obj, index) => (
         <div
-          className="sidebar-icon_btn_div"
+          className={`sidebar-icon_btn_div ${
+            !(
+              (windowWidth >= 600 && navToggle) ||
+              (windowWidth < 600 && !navToggle)
+            )
+              ? "flex-column"
+              : ""
+          } ${
+            !(
+              (windowWidth >= 600 && navToggle) ||
+              (windowWidth < 600 && !navToggle)
+            )
+              ? "text-center"
+              : ""
+          }`}
           key={index}
           style={{
             backgroundColor:
@@ -47,16 +60,6 @@ export default function Sidebar({ marginTopFromProps }) {
                 "/" /*&&((windowWidth>=600&&navToggle)||(windowWidth<600&&!navToggle))*/ &&
               "rgb(177, 177, 177)",
             //display:((windowWidth>=600&&navToggle)||(windowWidth<600&&!navToggle))&&"flex",
-            flexDirection:
-              !(
-                (windowWidth >= 600 && navToggle) ||
-                (windowWidth < 600 && !navToggle)
-              ) && "column" /*:"column"*/,
-            textAlign:
-              !(
-                (windowWidth >= 600 && navToggle) ||
-                (windowWidth < 600 && !navToggle)
-              ) && "center",
             // justifyContent:!((windowWidth>=600&&navToggle)||(windowWidth<600&&!navToggle))&&"flex-end",
             // alignItems:!((windowWidth>=600&&navToggle)||(windowWidth<600&&!navToggle))&&"center"
           }}
