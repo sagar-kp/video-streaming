@@ -1,4 +1,3 @@
-
 #root {
   font-family: sans-serif;
   /* , Inter, system-ui, Avenir, Helvetica, Arial, ; */
@@ -17,6 +16,15 @@
   cursor: pointer;
 }
 
+.fade-animation {
+  animation: fadeOpacity 0.4s infinite alternate;
+}
 
-
-
+@keyframes fadeOpacity {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.5;
+  }
+}

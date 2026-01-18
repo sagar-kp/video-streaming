@@ -11,10 +11,26 @@ export default function Card({ obj, channelOn }) {
   const [imgSrc, setImgSrc] = useState(null);
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
+  const handleClick = () => {
+    const id = obj?.id?.videoId || obj?.id?.playlistId || obj?.id?.channelId;
+    if (id?.length)
+      navigate(
+        obj?.id?.videoId
+          ? `/watch?v=${obj?.id?.videoId}`
+          : obj?.id?.playlistId
+          ? `/playlist?list=${obj?.id?.playlistId}`
+          : `/channels?id=${obj?.id?.channelId}`
+      );
+  };
   useEffect(() => {
-    loadImage(obj?.snippet?.thumbnails?.medium?.url)
-      .then((resp) => setImgSrc(resp))
-      .catch(() => setImgSrc(notFound));
+    const url = obj?.snippet?.thumbnails?.medium?.url;
+    if (url?.length)
+      loadImage(obj?.snippet?.thumbnails?.medium?.url)
+        .then((resp) => {
+          setImgSrc(resp);
+        })
+        .catch(() => setImgSrc(notFound));
+    else setImgSrc(null);
   }, [obj]);
   return (
     <div
@@ -31,7 +47,7 @@ export default function Card({ obj, channelOn }) {
     >
       <div className={`${obj?.id?.channelId ? "text-center" : ""}`}>
         <img
-          className="cursor-pointer"
+          className={`cursor-pointer ${!imgSrc ? "fade-animation" : ""}`}
           src={imgSrc ?? Loading}
           alt="thumbnails"
           style={{
@@ -41,15 +57,7 @@ export default function Card({ obj, channelOn }) {
             borderRadius: obj?.id?.channelId ? "50%" : "13px",
             blockSize: "auto",
           }}
-          onClick={() => {
-            navigate(
-              obj?.id?.videoId
-                ? `/watch?v=${obj?.id?.videoId}`
-                : obj?.id?.playlistId
-                ? `/playlist?list=${obj?.id?.playlistId}`
-                : `/channels?id=${obj?.id?.channelId}`
-            );
-          }}
+          onClick={handleClick}
         />
       </div>
       <div
@@ -61,15 +69,7 @@ export default function Card({ obj, channelOn }) {
           fontSize:
             window?.location?.pathname === "/channels" ? "14px" : "16px",
         }}
-        onClick={() => {
-          navigate(
-            obj?.id?.videoId
-              ? `/watch?v=${obj?.id?.videoId}`
-              : obj?.id?.playlistId
-              ? `/playlist?list=${obj?.id?.playlistId}`
-              : `/channels?id=${obj?.id?.channelId}`
-          );
-        }}
+        onClick={handleClick}
       >
         {obj?.snippet?.title}
       </div>

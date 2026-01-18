@@ -5,60 +5,46 @@ import Sidebar from "./reusables/Sidebar";
 // import Videos from "./reusables/Card";
 import Card from "./reusables/Card";
 import { useAppContext } from "../context/AppContext";
-import LoadingSpinner from "./reusables/LoadingSpinner";
+import { homePagePlaceholder } from "../utils/placeholderData";
 
 export default function Home() {
   const { selectedCategory } = useAppContext();
-  const [objs, setObjs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [objs, setObjs] = useState(homePagePlaceholder.items);
   useEffect(() => {
     document.title = "Vi-Stream";
-    setLoading(true);
+    setObjs(homePagePlaceholder.items);
     FetchAPI(
       `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`
     )
       .then(({ data }) => {
         if (data?.items) {
-          let arr1 = [],
-            arr2 = [];
-          data?.items.forEach((obj) =>
-            obj?.id?.hasOwnProperty("videoId")
-              ? arr1?.push(obj)
-              : arr2?.push(obj)
-          );
-
           setObjs(data?.items);
         } else setObjs([]);
-        setLoading(false);
       })
-      .catch(() => {
-        setLoading(false);
-      });
+      .catch(() => {});
   }, [selectedCategory]);
   return (
     <div className="d-flex" style={{ marginTop: "60px" }}>
       <Sidebar />
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <div className="container">
-          <div className="row">
-            {objs.map((obj) => (
-              <Card
-                obj={obj}
-                channelOn={true}
-                key={
-                  obj?.id?.hasOwnProperty("videoId")
+      <div className="container">
+        <div className="row">
+          {objs.map((obj, index) => (
+            <Card
+              obj={obj}
+              channelOn={true}
+              key={
+                obj?.id?.length
+                  ? obj?.id?.hasOwnProperty("videoId")
                     ? obj?.id?.videoId
                     : obj?.id?.hasOwnProperty("playlistId")
                     ? obj?.id?.playlistId
                     : obj?.id?.channelId
-                }
-              />
-            ))}
-          </div>
+                  : index
+              }
+            />
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
