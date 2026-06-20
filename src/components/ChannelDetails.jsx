@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { FetchAPI } from "../utils/apiCalls";
 import { useNavigate, useSearchParams } from "react-router-dom";
-// import Videos from "./reusables/Videos"
 import Sidebar from "./reusables/Sidebar";
-import { useWindowWidth } from "../utils/MyHooks";
+import useWindowWidth from "../hooks/useWindowWidth";
 import Card from "./reusables/Card";
 import { loadImage, roundSubsAndLikes } from "../utils/myFunctions";
 import ReactPlayer from "react-player";
 import { useTranslation } from "react-i18next";
 import cookies from "js-cookie";
-import { SetTimePassed } from "../utils/MyHooks";
+import SetTimePassed from "./SetTimePassed";
 import LoadingSpinner from "./reusables/LoadingSpinner";
+import "./styles/channelDetails.css";
 
 export default function ChannelDetails() {
   let [searchParams] = useSearchParams();
@@ -47,11 +47,11 @@ export default function ChannelDetails() {
           if (data?.items[0]?.brandingSettings?.channel?.unsubscribedTrailer) {
             FetchAPI(
               "videos?part=contentDetails,snippet,statistics&id=" +
-                data?.items[0]?.brandingSettings?.channel?.unsubscribedTrailer
+                data?.items[0]?.brandingSettings?.channel?.unsubscribedTrailer,
             )
               ?.then((respns) => {
                 setUnsubVid(
-                  respns?.data?.items?.length > 0 ? respns?.data?.items[0] : {}
+                  respns?.data?.items?.length > 0 ? respns?.data?.items[0] : {},
                 );
                 setSelOptn("home");
               })
@@ -62,7 +62,7 @@ export default function ChannelDetails() {
               data?.items?.length > 0
                 ? `&channel=${data?.items[0]?.snippet?.title}`
                 : ""
-            }&maxResults=100`
+            }&maxResults=100`,
           )
             .then(({ data }) => {
               let arr = [];
@@ -75,7 +75,7 @@ export default function ChannelDetails() {
                   arr?.push(obj);
               });
               setPlaylists(arr?.length > 0 ? arr : []);
-              setNoPlaylists(arr?.length > 0 ? false : true);
+              setNoPlaylists(arr?.length === 0);
             })
             .catch(() => {});
         }
@@ -90,12 +90,12 @@ export default function ChannelDetails() {
         let arr2 = [];
         if (data.items) {
           const videos = data?.items?.filter((obj) =>
-            obj?.id?.hasOwnProperty("videoId")
+            obj?.id?.hasOwnProperty("videoId"),
           );
           videos.forEach((obj) =>
             obj?.snippet?.liveBroadcastContent === "none"
               ? arr1?.push(obj)
-              : arr2?.push(obj)
+              : arr2?.push(obj),
           );
           arr1?.length > 0 ? setVids(arr1) : setNoVids(true);
           arr2?.length > 0 ? setLive(arr2) : setNoLive(true);
@@ -107,47 +107,31 @@ export default function ChannelDetails() {
     setDate(
       new Date(Date?.parse(channel?.snippet?.publishedAt))
         ?.toString()
-        ?.split(" ")
+        ?.split(" "),
     );
   }, [channel]);
   return (
-    <div className="d-flex" style={{ marginTop: "60px" }}>
+    <div className="d-flex channel-container">
       <Sidebar />
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <div style={{ flex: "90%" }}>
+        <div className="channel-main">
           <div>
             {channel?.brandingSettings?.image?.bannerExternalUrl && (
-              <div
-                className="overflow-hidden"
-                style={{
-                  height: `${windowWidth * 0.1621}px`,
-                }}
-              >
+              <div className="banner-container">
                 <img
-                  className="w-100"
+                  className="w-100 banner-img"
                   src={channel?.brandingSettings?.image?.bannerExternalUrl}
-                  style={{ transform: "translate(0px, -33%)" }} //-228px
                   alt="banner"
                 />
               </div>
             )}
-            <div className="d-flex" style={{ marginTop: "30px" }}>
-              <img
-                className={`rounded-circle ${windowWidth < 700}?"d-none":""`}
-                src={imgSrc}
-                alt="logo"
-                style={{
-                  marginLeft: "20px",
-                  width: "120px",
-                }}
-              />
-              <div style={{ margin: "20px 0px 0px 20px" }}>
-                <div style={{ fontSize: "x-large" }}>
-                  {channel?.snippet?.title}
-                </div>
-                <div className="d-flex" style={{ fontSize: "15px" }}>
+            <div className="channel-header">
+              <img className="channel-avatar" src={imgSrc} alt="logo" />
+              <div className="channel-info">
+                <div className="channel-title">{channel?.snippet?.title}</div>
+                <div className="channel-stats">
                   <div className="fw-bold text-secondary">
                     {channel?.snippet?.customUrl}
                   </div>
@@ -158,7 +142,7 @@ export default function ChannelDetails() {
                         {`${
                           channel?.statistics?.subscriberCount > 999
                             ? roundSubsAndLikes(
-                                channel?.statistics?.subscriberCount
+                                channel?.statistics?.subscriberCount,
                               )
                             : channel?.statistics?.subscriberCount
                         } ${t("subs", "subscribers")}`}
@@ -181,40 +165,28 @@ export default function ChannelDetails() {
               </div>
             </div>
           </div>
-          <div
-            className="d-flex justify-content-around"
-            style={{
-              borderBottom: "0.8px solid lightgray",
-              marginTop: "20px",
-            }}
-          >
+          <div className="channel-options-bar">
             {["home", "videos", "playlists", "live", "about"].map((str) => (
               <div
                 key={str}
                 onClick={() => setSelOptn(str)}
-                className="channelDet-options"
-                style={{
-                  color: selOptn === str && "rgb(63,63,63)",
-                  borderBottom: selOptn === str && "2px solid rgb(63, 63, 63)",
-                }}
+                className={`channelDet-options channel-option ${
+                  selOptn === str ? "selected" : ""
+                }`}
               >
                 {t(str, str?.toUpperCase())?.toUpperCase()}
               </div>
             ))}
           </div>
           {selOptn?.length > 0 && Object.keys(channel)?.length > 0 && (
-            <div style={{ marginTop: "30px" }}>
+            <div className="channel-content">
               {selOptn === "home" && (
                 <div>
                   {channel?.brandingSettings?.channel?.unsubscribedTrailer && (
                     <div className={windowWidth > 850 ? "d-flex" : ""}>
                       <div>
                         <div
-                          style={{
-                            height: windowWidth < 500 ? "174.28px" : "253px",
-                            width: windowWidth < 500 ? "300px" : "435px",
-                            margin: windowWidth < 610 && "auto",
-                          }}
+                          className={`player-wrapper ${windowWidth < 500 ? "player-small" : "player-large"} ${windowWidth < 610 ? "player-auto" : ""}`}
                         >
                           <ReactPlayer
                             controls
@@ -225,19 +197,20 @@ export default function ChannelDetails() {
                         </div>
                       </div>
                       <div
-                        style={{
-                          margin: windowWidth > 850 ? "0% 20px" : "20px 0px",
-                          width:
-                            windowWidth <= 850 && windowWidth >= 610 && "435px",
-                        }}
+                        className={`player-info ${
+                          windowWidth > 850
+                            ? "player-info-large"
+                            : "player-info-small"
+                        } ${
+                          windowWidth <= 850 && windowWidth >= 610
+                            ? "player-info-medium"
+                            : ""
+                        }`}
                       >
                         {Object.keys(unsubVid)?.length > 0 && (
                           <div>
                             <div
-                              className="videos-title fw-bold cursor-pointer"
-                              style={{
-                                fontSize: "14px",
-                              }}
+                              className="videos-title fw-bold cursor-pointer video-title"
                               onClick={() =>
                                 navigate(`/watch?v=${unsubVid?.id}`)
                               }
@@ -245,30 +218,16 @@ export default function ChannelDetails() {
                               {unsubVid?.snippet?.title}
                             </div>
 
-                            <div
-                              className="d-flex text-secondary"
-                              style={{
-                                margin: "8px 0px",
-                                fontSize: "small",
-                              }}
-                            >
+                            <div className="d-flex text-secondary video-meta">
                               {unsubVid?.statistics?.viewCount && (
                                 <>
                                   <span>
                                     {parseInt(
-                                      unsubVid?.statistics?.viewCount
+                                      unsubVid?.statistics?.viewCount,
                                     )?.toLocaleString()}{" "}
                                     {t("views", "views")} &nbsp;
                                   </span>
-                                  <div
-                                    className="fw-bold"
-                                    style={{
-                                      fontSize: "larger",
-                                      marginTop: "-6px",
-                                    }}
-                                  >
-                                    .
-                                  </div>
+                                  <div className="fw-bold dot">.</div>
                                   &nbsp;
                                 </>
                               )}
@@ -278,7 +237,7 @@ export default function ChannelDetails() {
                               <SetTimePassed
                                 date={
                                   new Date(
-                                    Date.parse(unsubVid?.snippet?.publishedAt)
+                                    Date.parse(unsubVid?.snippet?.publishedAt),
                                   )
                                 }
                               />{" "}
@@ -288,28 +247,20 @@ export default function ChannelDetails() {
                             </div>
                             {unsubVid?.snippet?.description &&
                               windowWidth > 850 && (
-                                <div style={{ fontSize: "14px" }}>
-                                  <div
-                                    className="overflow-hidden"
-                                    style={{
-                                      lineHeight: "20px",
-                                      height: "83px",
-                                    }}
-                                  >
-                                    {unsubVid?.snippet?.description}
-                                  </div>
-                                  <button
-                                    className="border-0 bg-transparent"
-                                    style={{
-                                      fontSize: "12px",
-                                    }}
-                                    onClick={() =>
-                                      navigate(`/watch?v=${unsubVid?.id}`)
-                                    }
-                                  >
-                                    {t("readMore", "READ MORE")}
-                                  </button>
+                                <div className="description">
+                                  {unsubVid?.snippet?.description}
                                 </div>
+                              )}
+                            {unsubVid?.snippet?.description &&
+                              windowWidth > 850 && (
+                                <button
+                                  className="read-more"
+                                  onClick={() =>
+                                    navigate(`/watch?v=${unsubVid?.id}`)
+                                  }
+                                >
+                                  {t("readMore", "READ MORE")}
+                                </button>
                               )}
                           </div>
                         )}
@@ -322,10 +273,7 @@ export default function ChannelDetails() {
                 <div>
                   {(selOptn === "videos" && noVids) ||
                   (selOptn === "live" && noLive) ? (
-                    <div
-                      className="d-flex justify-content-center"
-                      style={{ fontSize: "15px" }}
-                    >
+                    <div className="no-videos">
                       {t("noVid", "This channel has no videos.")}
                     </div>
                   ) : (
@@ -354,12 +302,7 @@ export default function ChannelDetails() {
               {selOptn === "playlists" && (
                 <div>
                   {noPlaylists ? (
-                    <div
-                      className="d-flex justify-content-center"
-                      style={{
-                        fontSize: "15px",
-                      }}
-                    >
+                    <div className="no-playlists">
                       {t("noPlayList", "This channel has no playlists.")}
                     </div>
                   ) : (
@@ -378,25 +321,25 @@ export default function ChannelDetails() {
                 </div>
               )}
               {selOptn === "about" && (
-                <div className="d-flex" style={{ padding: "3% 7%" }}>
-                  <div style={{ flex: "60%" }}>
+                <div className="about-section">
+                  <div className="about-left">
                     {channel?.brandingSettings?.channel?.description?.length >
                       0 && (
                       <>
                         {t("descr", "Description")}
                         <br />
                         <br />
-                        <span style={{ fontSize: "15px" }}>
+                        <span className="stats-text">
                           {channel?.brandingSettings?.channel?.description}
                         </span>
                       </>
                     )}
                   </div>
-                  <div style={{ flex: "30%", marginLeft: "5%" }}>
+                  <div className="about-right">
                     {t("stats", "Stats")}
                     <br />
                     <hr />
-                    <span style={{ fontSize: "15px" }}>{`${
+                    <span className="stats-text">{`${
                       currLangCode !== "hi" ? t("joined", "Joined") : ""
                     } ${date[1]} ${date[2]}, ${date[3]} ${
                       currLangCode === "hi" ? t("joined", "Joined") : ""
@@ -404,9 +347,9 @@ export default function ChannelDetails() {
                     <br />
                     <hr />
                     {parseInt(channel?.statistics?.viewCount) > 0 && (
-                      <span style={{ fontSize: "15px" }}>
+                      <span className="stats-text">
                         {parseInt(
-                          channel?.statistics?.viewCount
+                          channel?.statistics?.viewCount,
                         )?.toLocaleString()}{" "}
                         {t("views", "views")}
                       </span>

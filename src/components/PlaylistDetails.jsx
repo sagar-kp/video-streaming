@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FetchAPI } from "../utils/apiCalls";
-import { useWindowWidth } from "../utils/MyHooks";
+import useWindowWidth from "../hooks/useWindowWidth";
 import Sidebar from "./reusables/Sidebar";
 import { VideoCard } from "./VideoDetails";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import cookies from "js-cookie";
 import { loadImage } from "../utils/myFunctions";
 import LoadingSpinner from "./reusables/LoadingSpinner";
 import { Loading } from "../assets";
+import "./styles/playlistDetails.css";
 
 export default function PlaylistDetails() {
   const [searchParams] = useSearchParams();
@@ -51,8 +52,8 @@ export default function PlaylistDetails() {
           date = new Date(
             Date.parse(
               data?.items?.[diff?.indexOf(Math.min(...diff))]?.snippet
-                ?.publishedAt
-            )
+                ?.publishedAt,
+            ),
           )?.toDateString();
           date = date?.slice(4, 10) + "," + date?.slice(11);
           //console.log(date, diff)
@@ -62,60 +63,39 @@ export default function PlaylistDetails() {
       .catch(() => {});
   }, [list]);
   return (
-    <div className="d-flex" style={{ marginTop: "60px" }}>
+    <div className="playlist-container">
       <Sidebar />
       {loading ? (
         <LoadingSpinner />
       ) : (
         <div className={windowWidth > 1080 ? "d-flex" : ""}>
           <div
-            className={`text-white`}
-            style={{
-              flex: windowWidth > 1080 && "30%",
-              height: windowWidth > 1080 && "75vh",
-              padding: "2%",
-              borderRadius: "17px",
-              marginTop: "2%",
-              backgroundColor: "rgb(48, 17, 114)",
-            }}
+            className={`left-panel text-white ${windowWidth > 1080 ? "left-panel-wide" : ""}`}
           >
-            <img style={{ borderRadius: "11px" }} src={imgSrc ?? Loading} />
-            <div
-              style={{
-                fontSize: "x-large",
-                fontWeight: "800",
-                marginTop: "3.5%",
-              }}
-            >
-              {playlist?.snippet?.title}
-            </div>
-            <div
-              className="fw-bold"
-              style={{
-                fontSize: "small",
-                marginTop: "3.5%",
-              }}
-            >
+            <img
+              className="playlist-img"
+              src={imgSrc ?? Loading}
+              alt="playlist"
+            />
+            <div className="playlist-title">{playlist?.snippet?.title}</div>
+            <div className="fw-bold playlist-channel">
               {playlist?.snippet?.channelTitle}
             </div>
             {playlistVids?.length > 0 && (
-              <div className="d-flex" style={{ fontSize: "11.5px" }}>
+              <div className="d-flex playlist-stats">
                 {playlistVids?.length} {t("videos", "videos")} &nbsp;{" "}
                 {updated && (
-                  <span>{`${currLangCode === "hi" ? updated : ""} ${t(
-                    "lastUpdated",
-                    "Last updated on"
-                  )} ${currLangCode !== "hi" ? updated : ""}`}</span>
+                  <span>{`${
+                    currLangCode === "hi" ? updated : ""
+                  } ${t("lastUpdated", "Last updated on")} ${
+                    currLangCode === "hi" ? "" : updated
+                  }`}</span>
                 )}
               </div>
             )}
           </div>
           <div
-            style={{
-              flex: windowWidth > 1080 && "70%",
-              marginTop: "2.5%",
-              marginLeft: "1%",
-            }}
+            className={`right-panel ${windowWidth > 1080 ? "70%" : "layout-wide"}`}
           >
             {playlistVids?.map((obj, idx) => (
               <VideoCard key={obj?.id} det={{ obj, idx }} />

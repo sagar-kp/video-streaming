@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { FetchAPI } from "../utils/apiCalls";
 import Sidebar from "./reusables/Sidebar";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useWindowWidth, SetTimePassed } from "../utils/MyHooks";
+import useWindowWidth from "../hooks/useWindowWidth";
+import SetTimePassed from "./SetTimePassed";
 import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "./reusables/LoadingSpinner";
+import "./styles/searchResults.css";
+import { getNavigatePath } from "../utils/myFunctions";
 
 export default function SearchResults() {
   const [objs, setObjs] = useState([]);
@@ -18,16 +21,13 @@ export default function SearchResults() {
   const query = searchParams.get("query");
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    if (!query) setNoResults(true);
-    else {
+    if (query) {
       document.title = `${query} - Vi-Stream`;
       setLoading(true);
       FetchAPI(`search?part=snippet&q=${query}&order=date&maxResults=50`)
         .then(({ data }) => {
           if (data?.items) {
             setNoResults(false);
-            // let arr = data?.items.filter(obj=>obj.id.hasOwnProperty("videoId"))
-            // let arr2 = data?.items.filter(obj=>!obj.id.hasOwnProperty("videoId"))
 
             setObjs(data?.items);
           } else {
@@ -38,80 +38,45 @@ export default function SearchResults() {
         .catch(() => {
           setLoading(false);
         });
-    }
+    } else setNoResults(true);
   }, [query]);
   return (
-    <div className="d-flex" style={{ marginTop: "60px" }}>
+    <div className="d-flex search-results-container">
       <Sidebar />
       {loading ? (
         <LoadingSpinner />
       ) : noResults ? (
-        <div
-          className="d-flex justify-content-center"
-          style={{
-            flex: "100%",
-            paddingTop: "6%",
-          }}
-        >
+        <div className="d-flex justify-content-center sr-noresults">
           <h4>{t("noResultsFnd", "No results found")}</h4>
         </div>
       ) : (
-        <div style={{ margin: "2% 0% 0% 3%" }}>
+        <div className="sr-results">
           {objs.map((obj, index) => (
             <div
-              className="d-flex"
+              className={`d-flex ${windowWidth < 700 ? "sr-row" : ""}`}
               key={index}
-              style={{
-                marginBottom: windowWidth < 700 && "5%",
-              }}
             >
-              <div
-                className="search-img_div text-center"
-                style={{ flex: "30%" }}
-              >
+              <div className="search-img_div text-center sr-col-30">
                 <img
-                  className="search-img"
+                  className={`search-img ${
+                    obj?.id?.channelId
+                      ? "search-img--channel"
+                      : "search-img--default"
+                  }`}
                   src={obj?.snippet?.thumbnails?.high?.url}
-                  style={{
-                    width: obj?.id?.channelId ? "40%" : "95%",
-                    height: !obj?.id?.channelId && "83%",
-                    margin: obj?.id?.channelId && "0% 2.5% 10% 0%",
-                    borderRadius: obj?.id?.channelId ? "50%" : "15px",
-                  }}
-                  onClick={() =>
-                    navigate(
-                      obj?.id?.videoId
-                        ? `/watch?v=${obj?.id?.videoId}`
-                        : obj?.id?.playlistId
-                        ? `/playlist?list=${obj?.id?.playlistId}`
-                        : `/channels?id=${obj?.snippet?.channelId}`
-                    )
-                  }
+                  alt="thumbnail"
+                  onClick={() => navigate(getNavigatePath(obj))}
                 />
               </div>
-              <div style={{ flex: "70%" }}>
+              <div className="sr-col-70">
                 <div
-                  className="videos-title cursor-pointer"
-                  style={{
-                    padding:
-                      windowWidth < 750 ? "0.2% 2% 0.1%" : "2.9% 2% 0.1%",
-                    fontSize: windowWidth < 750 ? "15px" : "19px",
-                    lineHeight: windowWidth < 750 && "17px",
-                  }}
-                  onClick={() =>
-                    navigate(
-                      obj?.id?.videoId
-                        ? `/watch?v=${obj?.id?.videoId}`
-                        : obj?.id?.playlistId
-                        ? `/playlist?list=${obj?.id?.playlistId}`
-                        : `/channels?id=${obj?.snippet?.channelId}`
-                    )
-                  }
+                  className={`videos-title cursor-pointer ${windowWidth < 750 ? "sr-title-small" : "sr-title"}`}
+                  onClick={() => navigate(getNavigatePath(obj))}
                 >
                   {obj?.snippet?.title}
                 </div>
                 {!obj?.id?.hasOwnProperty("channelId") && (
-                  <div style={{ padding: "0.9% 2% 0.1%", fontSize: "small" }}>
+                  <div className="sr-meta">
                     {currLangCode === "fr" ? t("ago", "il y a ") : ""}{" "}
                     <SetTimePassed
                       date={new Date(Date.parse(obj?.snippet?.publishedAt))}
@@ -121,11 +86,7 @@ export default function SearchResults() {
                 )}
                 {!obj?.id?.hasOwnProperty("channelId") && (
                   <div
-                    className="fw-bold cursor-pointer"
-                    style={{
-                      padding: "0.1% 2% 0%",
-                      fontSize: "small",
-                    }}
+                    className="fw-bold cursor-pointer sr-small-row"
                     onClick={() =>
                       navigate(`/channels?id=${obj?.snippet?.channelId}`)
                     }
@@ -135,11 +96,7 @@ export default function SearchResults() {
                 )}
                 {obj?.id?.playlistId && (
                   <div
-                    className="fw-bold cursor-pointer"
-                    style={{
-                      padding: "0.1% 2% 0%",
-                      fontSize: "small",
-                    }}
+                    className="fw-bold cursor-pointer sr-playlist-link"
                     onClick={() =>
                       navigate(`/playlist?list=${obj?.id?.playlistId}`)
                     }
@@ -148,13 +105,7 @@ export default function SearchResults() {
                   </div>
                 )}
                 {obj?.id?.hasOwnProperty("channelId") && (
-                  <div
-                    className="videos-title fw-normal"
-                    style={{
-                      padding: "0.1% 2% 0%",
-                      fontSize: "small",
-                    }}
-                  >
+                  <div className="videos-title fw-normal sr-description">
                     {obj?.snippet?.description}
                   </div>
                 )}

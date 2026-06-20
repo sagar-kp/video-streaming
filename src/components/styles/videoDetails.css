@@ -1,0 +1,208 @@
+/* Icon */
+.icon-lg {
+  font-size: larger;
+  padding-right: 5px;
+}
+
+/* VideoCard row */
+
+.video-row--default {
+  padding: 1%;
+}
+.video-row--playlist {
+  margin: 14px 0;
+}
+
+/* Index box shown in playlist */
+.index-box {
+  margin: 0 1%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.index-box-narrow {
+  flex: 0.1%;
+}
+
+/* Thumbnails */
+.thumb--playlist {
+  width: 165px;
+}
+.thumb--wide {
+  width: 30%;
+}
+.thumb--default {
+  width: 40%;
+}
+
+/* Meta column */
+.meta-col {
+  flex: 60%;
+  padding-left: 5px;
+}
+
+/* Titles */
+
+.video-title-small {
+  font-size: 14px;
+}
+
+/* Channel link and related */
+
+.channel-link--small {
+  font-size: 12.8px;
+  padding-top: 3px;
+}
+.dot-neg {
+  margin-top: -5px;
+}
+
+/* Time meta */
+.time-meta {
+  font-size: small;
+}
+.time-meta--playlist {
+  margin-top: 3px;
+}
+
+/* Comment block */
+.comment-row {
+  margin-bottom: 12px;
+}
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+.comment-text {
+  font-size: small;
+}
+.comment-body {
+  margin-top: 5px;
+  line-height: 19.5px;
+  overflow: hidden;
+}
+.comment-body--collapsed {
+  height: 80px;
+}
+.comment-actions-margin {
+  margin-top: 7px;
+}
+
+/* Page layout */
+
+.video-main {
+  padding: 2px 0px 10px;
+}
+
+.video-details-container {
+  margin-top: 60px;
+}
+.left-column {
+  flex: 68%;
+  padding: 2%;
+}
+.right-column {
+  flex: 31%;
+  padding: 2%;
+}
+
+/* No video found */
+.no-video-found {
+  height: 85vh;
+  font-size: x-large;
+  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-video-img {
+  width: 295px;
+  margin-bottom: 20px;
+}
+
+/* Go home button */
+.go-home-btn {
+  border: 0.5px solid lightgray;
+  border-radius: 19px;
+  font-size: small;
+  color: #1e85dd;
+  padding: 7px 15px;
+  margin-top: 37px;
+  background: transparent;
+}
+
+/* Player height variants */
+.player-height-small {
+  height: 200px;
+}
+.player-height-medium {
+  height: 300px;
+}
+.player-height-large {
+  height: 420px;
+}
+.player-height-xlarge {
+  height: 470px;
+}
+
+/* Heading and channel info */
+.video-heading {
+  padding-top: 10px;
+  font-size: large;
+}
+.channel-avatar2 {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+.channel-name {
+  margin-bottom: -5px;
+}
+
+/* Subscriber & likes */
+.subscriber-count {
+  font-size: small;
+}
+.likes-box {
+  display: flex;
+  margin-bottom: 2px;
+  padding: 5px 17px;
+  border-radius: 60px;
+  background-color: rgb(242, 242, 242);
+  font-weight: bold;
+}
+.likes-box--small {
+  margin-left: 2%;
+}
+.likes-box--large {
+  margin-left: 40%;
+}
+.likes-count {
+  margin-top: 1.5px;
+}
+.separator {
+  font-size: 20px;
+  margin-top: -9px;
+  padding: 5%;
+}
+
+/* Description */
+.description-box {
+  padding: 1%;
+  background-color: rgb(242, 242, 242);
+  border-radius: 5px;
+}
+.description-body {
+  font-size: 14px;
+  line-height: 19px;
+  overflow: hidden;
+}
+.description-body--collapsed {
+  height: 79px;
+}
+
+/* Comments section */
+.comments-section {
+  margin-top: 30px;
+}

@@ -1,0 +1,49 @@
+/* Thumbnail */
+.card-image {
+  max-inline-size: 100%;
+  block-size: auto;
+  width: 100%;
+  border-radius: 13px;
+}
+.card-img-channel {
+  width: 45%;
+  margin: 5%;
+  border-radius: 50%;
+}
+
+/* Title */
+.card-title {
+  padding: 2.9% 0% 0.1%;
+  cursor: pointer;
+}
+.card-title-default {
+  font-size: 16px;
+}
+.card-title-channels {
+  font-size: 14px;
+}
+
+/* Channel / description when channelOn */
+.channel-desc-default {
+  font-size: 14.4px;
+}
+.channel-desc-channels {
+  font-size: small;
+}
+
+/* Playlist link */
+.playlist-link {
+  cursor: pointer;
+  font-size: 14.4px;
+}
+
+/* Video meta / time passed */
+.card-time {
+  padding: 0 0 6%;
+}
+.card-time-default {
+  font-size: 14.4px;
+}
+.card-time-channels {
+  font-size: small;
+}
