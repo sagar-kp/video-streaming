@@ -1,0 +1,60 @@
+.search-results-container {
+  margin-top: 60px;
+}
+
+.sr-noresults {
+  flex: 100%;
+  padding-top: 6%;
+}
+
+.sr-results {
+  margin: 2% 0% 0% 3%;
+}
+
+.sr-row {
+  margin-bottom: 5%;
+}
+
+.sr-col-30 {
+  flex: 30%;
+}
+.sr-col-70 {
+  flex: 70%;
+}
+
+.search-img:hover {
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.2);
+}
+.search-img--channel {
+  width: 40%;
+  margin: 0% 2.5% 10% 0%;
+  border-radius: 50%;
+}
+.search-img--default {
+  width: 95%;
+  height: 83%;
+  border-radius: 15px;
+}
+
+.sr-title {
+  padding: 2.9% 2% 0.1%;
+  font-size: 19px;
+}
+.sr-title-small {
+  padding: 0.2% 2% 0.1%;
+  font-size: 15px;
+  line-height: 17px;
+}
+
+.sr-meta {
+  padding: 0.9% 2% 0.1%;
+  font-size: small;
+}
+
+.sr-small-row,
+.sr-playlist-link,
+.sr-description {
+  padding: 0.1% 2% 0%;
+  font-size: small;
+}

@@ -4,9 +4,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import cookies from "js-cookie";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
-import { useWindowWidth } from "../utils/MyHooks";
+import useWindowWidth from "../hooks/useWindowWidth";
 import ProgressBar from "./ProgressBar";
 import { useAppContext } from "../context/AppContext";
+import "./styles/navbar.css";
 
 const langCodes = {
   en: "English",
@@ -20,148 +21,110 @@ export default function Navbar() {
   const { t } = useTranslation();
   const windowWidth = useWindowWidth();
   const query = searchParams.get("query");
-  const [ipVal, setIpVal] = useState(query ? query : "");
+  const [inputValue, setInputValue] = useState(query ?? "");
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const currLangCode = cookies.get("i18next") || "en";
   const navigate = useNavigate();
   useEffect(() => {
     setCount((prev) => prev + 1);
-  }, [window?.location?.pathname, query]);
+  }, [globalThis?.location?.pathname, query]);
   useEffect(() => {
-    if (query) setIpVal(query);
+    if (query) setInputValue(query);
   }, [query]);
   return (
     <>
-      {count > 1 && window?.location?.pathname !== "/" && <ProgressBar />}
-      <div
-        className="d-flex position-fixed top-0 w-100 bg-white"
-        style={{
-          padding: "0.7%",
-          zIndex: "10",
-        }}
-      >
+      {count > 1 && globalThis?.location?.pathname !== "/" && <ProgressBar />}
+      <div className={`navbar-fixed`}>
         <i
-          className="bi bi-list navbar-ham_icon"
-          style={{ fontSize: "25px", marginLeft: !windowWidth < 500 && "10px" }}
+          className={`bi bi-list navbar-ham_icon ${
+            windowWidth >= 500 ? "navbar-ham-margin" : ""
+          }`}
           onClick={() => {
             setNavToggle((prev) => !prev);
             if (open) setOpen(false);
           }}
         ></i>
         <img
-          className="cursor-pointer"
+          className={`logo ${
+            windowWidth < 500 ? "logo-small" : "logo-large"
+          } ${windowWidth >= 500 ? "logo-padding" : ""}`}
           src={Logo}
           alt="logo"
-          style={{
-            width: windowWidth < 500 ? "80px" : "140px",
-            marginTop: windowWidth < 500 ? "2px" : "-4px",
-            height: windowWidth < 500 ? "30.5px" : "45px",
-            paddingLeft: windowWidth >= 500 && "20px",
-          }}
           onClick={() => {
             navigate("/");
             if (open) setOpen(false);
           }}
         />
         <div
-          className="d-flex"
-          style={{
-            width: windowWidth < 500 ? "90%" : "50%",
-            border: "1px black solid",
-            borderRadius: "30px",
-            marginLeft: windowWidth < 500 ? "5px" : "50px",
-          }}
+          className={`d-flex search-wrap ${
+            windowWidth < 500 ? "small" : "large"
+          }`}
           onClick={() => {
             if (open) setOpen(false);
           }}
         >
           <input
-            className="border-0"
-            style={{
-              width: windowWidth < 500 ? "85%" : "90%",
-              borderStartStartRadius: "30px",
-              borderEndStartRadius: "30px",
-              paddingLeft: "20px",
-              outline: "none",
-            }}
+            className={`border-0 search-input ${
+              windowWidth < 500 ? "small" : "large"
+            }`}
             placeholder={t("search", "Search")}
-            value={ipVal}
-            onChange={(e) => setIpVal(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && ipVal?.length > 1)
-                navigate(`/results?query=${ipVal}`);
+              if (event.key === "Enter" && inputValue?.length > 1)
+                navigate(`/results?query=${inputValue}`);
             }}
           />
           <button
-            className="border-0"
-            style={{
-              width: windowWidth < 500 ? "15%" : "10%",
-              borderEndEndRadius: "30px",
-              borderStartEndRadius: "30px",
-            }}
+            className={`border-0 search-btn ${
+              windowWidth < 500 ? "small" : "large"
+            }`}
             onClick={() => {
-              navigate(`/results?query=${ipVal}`);
+              navigate(`/results?query=${inputValue}`);
             }}
           >
             <i className="bi bi-search"></i>
           </button>
         </div>
-        <div style={{ width: "15%", marginLeft: "2%", marginTop: "0.35%" }}>
+        <div className="nav-actions">
           <i
-            className="bi bi-translate cursor-pointer"
-            style={{ fontSize: "large" }}
+            className="bi bi-translate translate-icon"
             onClick={() => setOpen(!open)}
           ></i>
           {open && (
             <div
-              className="navbar-dropdown"
-              style={{ right: windowWidth < 950 ? "15%" : "25%" }}
+              className={`navbar-dropdown ${
+                windowWidth < 950 ? "right-medium" : "right-large"
+              }`}
             >
-              <div
-                className="d-flex align-items-center"
-                style={{ margin: "2% 0%" }}
-              >
+              <div className="d-flex align-items-center lang-div">
                 <i
-                  className="bi bi-arrow-left cursor-pointer rounded-circle"
+                  className="bi bi-arrow-left dropdown-back"
                   onClick={() => setOpen(false)}
-                  style={{
-                    padding: "0% 2%",
-                    fontSize: "x-large",
-                    margin: "0% 5%",
-                  }}
                 ></i>
                 {t("chsLang", "Choose Your Language")}
               </div>
               <hr />
-              <ul style={{ margin: "3% 0%" }}>
+              <ul className="lang-list">
                 {Object?.keys(langCodes)?.map((objKey) => (
                   <li
-                    className="cursor-pointer list-unstyled"
+                    className="cursor-pointer list-unstyled lang-item"
                     key={objKey}
-                    style={{
-                      marginLeft: "-30px",
-                    }}
                     onClick={() => {
                       i18next?.changeLanguage(objKey);
                       setOpen(false);
                     }}
                   >
-                    <div className="d-flex align-items-center">
-                      <div className="text-center" style={{ flex: "20%" }}>
-                        {
-                          <i
-                            style={{
-                              fontSize: "x-large",
-                              color: objKey !== currLangCode && "transparent",
-                            }}
-                            className="bi bi-check2"
-                          ></i>
-                        }
+                    <div className="lang-row">
+                      <div className="check-wrap">
+                        <i
+                          className={`bi bi-check2 check-icon ${
+                            objKey === currLangCode ? "" : "selected"
+                          }`}
+                        ></i>
                       </div>
-                      <div style={{ flex: "80%", fontSize: "15px" }}>
-                        {langCodes?.[objKey]}
-                      </div>
+                      <div className="lang-text">{langCodes?.[objKey]}</div>
                     </div>
                   </li>
                 ))}

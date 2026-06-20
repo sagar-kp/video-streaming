@@ -1,47 +1,34 @@
 import { useState, useEffect } from "react";
-// import { useWindowWidth } from "../utils/MyHooks";
 import { FetchAPI } from "../utils/apiCalls";
 import Sidebar from "./reusables/Sidebar";
-// import Videos from "./reusables/Card";
 import Card from "./reusables/Card";
 import { useAppContext } from "../context/AppContext";
 import { homePagePlaceholder } from "../utils/placeholderData";
+import { getKey } from "../utils/myFunctions";
 
 export default function Home() {
   const { selectedCategory } = useAppContext();
-  const [objs, setObjs] = useState(homePagePlaceholder.items);
+  const [objects, setObjects] = useState(homePagePlaceholder.items);
   useEffect(() => {
     document.title = "Vi-Stream";
-    setObjs(homePagePlaceholder.items);
+    setObjects(homePagePlaceholder.items);
     FetchAPI(
-      `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`
+      `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`,
     )
       .then(({ data }) => {
         if (data?.items) {
-          setObjs(data?.items);
-        } else setObjs([]);
+          setObjects(data?.items);
+        } else setObjects([]);
       })
       .catch(() => {});
   }, [selectedCategory]);
   return (
-    <div className="d-flex" style={{ marginTop: "60px" }}>
+    <div className="d-flex home-margin">
       <Sidebar />
       <div className="container">
         <div className="row">
-          {objs.map((obj, index) => (
-            <Card
-              obj={obj}
-              channelOn={true}
-              key={
-                obj?.id?.length
-                  ? obj?.id?.hasOwnProperty("videoId")
-                    ? obj?.id?.videoId
-                    : obj?.id?.hasOwnProperty("playlistId")
-                    ? obj?.id?.playlistId
-                    : obj?.id?.channelId
-                  : index
-              }
-            />
+          {objects.map((obj, index) => (
+            <Card obj={obj} channelOn={true} key={getKey(obj, index)} />
           ))}
         </div>
       </div>

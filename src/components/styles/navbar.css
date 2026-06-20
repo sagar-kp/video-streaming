@@ -1,0 +1,169 @@
+/* Container */
+.navbar-fixed {
+  display: flex;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  padding: 0.7%;
+  z-index: 10;
+}
+
+/* Hamburger icon */
+
+.navbar-ham-margin {
+  margin-left: 10px;
+}
+
+/* Logo */
+.logo {
+  cursor: pointer;
+}
+.logo-small {
+  width: 80px;
+  height: 30.5px;
+  margin-top: 2px;
+}
+.logo-large {
+  width: 140px;
+  height: 45px;
+  margin-top: -4px;
+}
+.logo-padding {
+  padding-left: 20px;
+}
+
+/* Search wrapper */
+.search-wrap {
+  display: flex;
+  border: 1px solid black;
+  border-radius: 30px;
+}
+.search-wrap.small {
+  width: 90%;
+  margin-left: 5px;
+}
+.search-wrap.large {
+  width: 50%;
+  margin-left: 50px;
+}
+
+/* Search input */
+.search-input {
+  border: 0;
+  padding-left: 20px;
+  outline: none;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+.search-input.small {
+  width: 85%;
+}
+.search-input.large {
+  width: 90%;
+}
+
+/* Search button */
+.search-btn {
+  border: 0;
+  cursor: pointer;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+.search-btn.small {
+  width: 15%;
+}
+.search-btn.large {
+  width: 10%;
+}
+
+/* Right-side actions container */
+.nav-actions {
+  width: 15%;
+  margin-left: 2%;
+  margin-top: 0.35%;
+}
+
+/* Translate icon */
+.translate-icon {
+  font-size: large;
+  cursor: pointer;
+}
+
+/* Navbar */
+
+.navbar-ham_icon {
+  cursor: pointer;
+  font-size: 25px;
+}
+.navbar-dropdown {
+  position: absolute;
+  background-color: white;
+  z-index: 2;
+  text-align: left;
+  border-radius: 5px;
+  width: 250px;
+  margin-top: 2%;
+  box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.2);
+}
+.navbar-dropdown i:hover,
+.navbar-dropdown li:hover {
+  background-color: rgba(235, 238, 238);
+}
+.navbar-dropdown hr {
+  font-size: 0.3px;
+  margin: 0;
+}
+/* Dropdown */
+
+.navbar-dropdown.right-medium {
+  right: 15%;
+}
+.navbar-dropdown.right-large {
+  right: 25%;
+}
+
+.lang-div {
+  margin: 2% 0%;
+}
+
+/* Dropdown header/back */
+.dropdown-back {
+  padding: 0 2%;
+  font-size: x-large;
+  margin: 0 5%;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+/* Language list */
+.lang-list {
+  margin: 3% 0%;
+}
+.lang-item {
+  list-style: none;
+  margin-left: -30px;
+  cursor: pointer;
+}
+
+/* Lang item layout */
+.lang-row {
+  display: flex;
+  align-items: center;
+}
+.check-wrap {
+  flex: 20%;
+  text-align: center;
+}
+.lang-text {
+  flex: 80%;
+  font-size: 15px;
+}
+
+/* Check icon */
+.check-icon {
+  font-size: x-large;
+}
+.check-icon.selected {
+  color: transparent;
+}

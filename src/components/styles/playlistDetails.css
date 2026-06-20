@@ -1,0 +1,59 @@
+/* Top-level spacing */
+.playlist-container {
+  margin-top: 60px;
+  display: flex;
+}
+
+/* Left panel (playlist info) */
+.left-panel {
+  padding: 2%;
+  border-radius: 17px;
+  margin-top: 2%;
+  background-color: rgb(48, 17, 114);
+}
+
+.left-panel-wide {
+  flex: 30%;
+  height: 75vh;
+}
+
+/* Sizes applied only in wide layout */
+.layout-wide .left-panel {
+  flex: 0 0 30%;
+  height: 75vh;
+}
+
+/* Thumbnail inside left panel */
+.playlist-img {
+  border-radius: 11px;
+}
+
+/* Playlist title and channel */
+.playlist-title {
+  font-size: x-large;
+  font-weight: 800;
+  margin-top: 3.5%;
+}
+
+.playlist-channel {
+  font-size: small;
+  margin-top: 3.5%;
+  font-weight: 700;
+}
+
+/* Stats row (count and last updated) */
+.playlist-stats {
+  display: flex;
+  font-size: 11.5px;
+}
+
+/* Right panel (video list) */
+.right-panel {
+  margin-top: 2.5%;
+  margin-left: 1%;
+}
+
+/* Wide layout right panel sizing */
+.layout-wide {
+  flex: 70%;
+}
