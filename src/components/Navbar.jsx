@@ -21,7 +21,7 @@ export default function Navbar() {
   const { t } = useTranslation();
   const windowWidth = useWindowWidth();
   const query = searchParams.get("query");
-  const [ipVal, setIpVal] = useState(query ?? "");
+  const [inputValue, setInputValue] = useState(query ?? "");
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const currLangCode = cookies.get("i18next") || "en";
@@ -30,7 +30,7 @@ export default function Navbar() {
     setCount((prev) => prev + 1);
   }, [globalThis?.location?.pathname, query]);
   useEffect(() => {
-    if (query) setIpVal(query);
+    if (query) setInputValue(query);
   }, [query]);
   return (
     <>
@@ -69,11 +69,11 @@ export default function Navbar() {
               windowWidth < 500 ? "small" : "large"
             }`}
             placeholder={t("search", "Search")}
-            value={ipVal}
-            onChange={(e) => setIpVal(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && ipVal?.length > 1)
-                navigate(`/results?query=${ipVal}`);
+              if (event.key === "Enter" && inputValue?.length > 1)
+                navigate(`/results?query=${inputValue}`);
             }}
           />
           <button
@@ -81,7 +81,7 @@ export default function Navbar() {
               windowWidth < 500 ? "small" : "large"
             }`}
             onClick={() => {
-              navigate(`/results?query=${ipVal}`);
+              navigate(`/results?query=${inputValue}`);
             }}
           >
             <i className="bi bi-search"></i>

@@ -20,14 +20,14 @@ export default function ChannelDetails() {
   const currLangCode = cookies.get("i18next") || "en";
   const [channel, setChannel] = useState({});
   const windowWidth = useWindowWidth();
-  const [selOptn, setSelOptn] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
   const [date, setDate] = useState(new Date().toString().split(" "));
-  const [vids, setVids] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [noLive, setNoLive] = useState(false);
-  const [noVids, setNoVids] = useState(false);
+  const [noVideos, setNoVideos] = useState(false);
   const [noPlaylists, setNoPlaylists] = useState(false);
   const [live, setLive] = useState([]);
-  const [unsubVid, setUnsubVid] = useState({});
+  const [unsubscribedVideo, setUnsubscribedVideo] = useState({});
   const [playlists, setPlaylists] = useState([]);
   const [imgSrc, setImgSrc] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,10 +50,10 @@ export default function ChannelDetails() {
                 data?.items[0]?.brandingSettings?.channel?.unsubscribedTrailer,
             )
               ?.then((respns) => {
-                setUnsubVid(
+                setUnsubscribedVideo(
                   respns?.data?.items?.length > 0 ? respns?.data?.items[0] : {},
                 );
-                setSelOptn("home");
+                setSelectedOption("home");
               })
               ?.catch(() => {});
           }
@@ -97,7 +97,7 @@ export default function ChannelDetails() {
               ? arr1?.push(obj)
               : arr2?.push(obj),
           );
-          arr1?.length > 0 ? setVids(arr1) : setNoVids(true);
+          arr1?.length > 0 ? setVideos(arr1) : setNoVideos(true);
           arr2?.length > 0 ? setLive(arr2) : setNoLive(true);
         }
       })
@@ -169,18 +169,18 @@ export default function ChannelDetails() {
             {["home", "videos", "playlists", "live", "about"].map((str) => (
               <div
                 key={str}
-                onClick={() => setSelOptn(str)}
+                onClick={() => setSelectedOption(str)}
                 className={`channelDet-options channel-option ${
-                  selOptn === str ? "selected" : ""
+                  selectedOption === str ? "selected" : ""
                 }`}
               >
                 {t(str, str?.toUpperCase())?.toUpperCase()}
               </div>
             ))}
           </div>
-          {selOptn?.length > 0 && Object.keys(channel)?.length > 0 && (
+          {selectedOption?.length > 0 && Object.keys(channel)?.length > 0 && (
             <div className="channel-content">
-              {selOptn === "home" && (
+              {selectedOption === "home" && (
                 <div>
                   {channel?.brandingSettings?.channel?.unsubscribedTrailer && (
                     <div className={windowWidth > 850 ? "d-flex" : ""}>
@@ -207,23 +207,23 @@ export default function ChannelDetails() {
                             : ""
                         }`}
                       >
-                        {Object.keys(unsubVid)?.length > 0 && (
+                        {Object.keys(unsubscribedVideo)?.length > 0 && (
                           <div>
                             <div
                               className="videos-title fw-bold cursor-pointer video-title"
                               onClick={() =>
-                                navigate(`/watch?v=${unsubVid?.id}`)
+                                navigate(`/watch?v=${unsubscribedVideo?.id}`)
                               }
                             >
-                              {unsubVid?.snippet?.title}
+                              {unsubscribedVideo?.snippet?.title}
                             </div>
 
                             <div className="d-flex text-secondary video-meta">
-                              {unsubVid?.statistics?.viewCount && (
+                              {unsubscribedVideo?.statistics?.viewCount && (
                                 <>
                                   <span>
                                     {parseInt(
-                                      unsubVid?.statistics?.viewCount,
+                                      unsubscribedVideo?.statistics?.viewCount,
                                     )?.toLocaleString()}{" "}
                                     {t("views", "views")} &nbsp;
                                   </span>
@@ -237,7 +237,9 @@ export default function ChannelDetails() {
                               <SetTimePassed
                                 date={
                                   new Date(
-                                    Date.parse(unsubVid?.snippet?.publishedAt),
+                                    Date.parse(
+                                      unsubscribedVideo?.snippet?.publishedAt,
+                                    ),
                                   )
                                 }
                               />{" "}
@@ -245,18 +247,20 @@ export default function ChannelDetails() {
                                 currLangCode !== "fr" ? t("ago", "ago") : ""
                               }`}
                             </div>
-                            {unsubVid?.snippet?.description &&
+                            {unsubscribedVideo?.snippet?.description &&
                               windowWidth > 850 && (
                                 <div className="description">
-                                  {unsubVid?.snippet?.description}
+                                  {unsubscribedVideo?.snippet?.description}
                                 </div>
                               )}
-                            {unsubVid?.snippet?.description &&
+                            {unsubscribedVideo?.snippet?.description &&
                               windowWidth > 850 && (
                                 <button
                                   className="read-more"
                                   onClick={() =>
-                                    navigate(`/watch?v=${unsubVid?.id}`)
+                                    navigate(
+                                      `/watch?v=${unsubscribedVideo?.id}`,
+                                    )
                                   }
                                 >
                                   {t("readMore", "READ MORE")}
@@ -269,18 +273,18 @@ export default function ChannelDetails() {
                   )}
                 </div>
               )}
-              {(selOptn === "videos" || selOptn === "live") && (
+              {(selectedOption === "videos" || selectedOption === "live") && (
                 <div>
-                  {(selOptn === "videos" && noVids) ||
-                  (selOptn === "live" && noLive) ? (
+                  {(selectedOption === "videos" && noVideos) ||
+                  (selectedOption === "live" && noLive) ? (
                     <div className="no-videos">
                       {t("noVid", "This channel has no videos.")}
                     </div>
                   ) : (
                     <div className="container">
                       <div className="row">
-                        {selOptn === "videos"
-                          ? vids.map((obj) => (
+                        {selectedOption === "videos"
+                          ? videos.map((obj) => (
                               <Card
                                 key={obj?.id?.videoId}
                                 obj={obj}
@@ -299,7 +303,7 @@ export default function ChannelDetails() {
                   )}
                 </div>
               )}
-              {selOptn === "playlists" && (
+              {selectedOption === "playlists" && (
                 <div>
                   {noPlaylists ? (
                     <div className="no-playlists">
@@ -320,7 +324,7 @@ export default function ChannelDetails() {
                   )}
                 </div>
               )}
-              {selOptn === "about" && (
+              {selectedOption === "about" && (
                 <div className="about-section">
                   <div className="about-left">
                     {channel?.brandingSettings?.channel?.description?.length >

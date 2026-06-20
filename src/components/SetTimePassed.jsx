@@ -31,7 +31,7 @@ const setTimePassed = (date) => {
 };
 
 const SetTimePassed = ({ date }) => {
-  const [retData, setRetData] = useState("");
+  const [returnData, setReturnData] = useState("");
   const { t } = useTranslation();
   const currLangCode = cookies.get("i18next") || "en";
 
@@ -39,7 +39,7 @@ const SetTimePassed = ({ date }) => {
     const timePassed = setTimePassed(date);
     const [num, name] = timePassed?.split(" ") ?? [];
     if (name?.charAt(name?.length - 1) === "s") {
-      setRetData(
+      setReturnData(
         num +
           " " +
           t(name?.slice(0, name?.length - 1)) +
@@ -48,10 +48,10 @@ const SetTimePassed = ({ date }) => {
             : "s"),
       );
     } else {
-      setRetData(num + " " + t(name, name));
+      setReturnData(num + " " + t(name, name));
     }
   }, [currLangCode]);
-  return <>{retData}</>;
+  return <>{returnData}</>;
 };
 
 export default SetTimePassed;

@@ -8,17 +8,17 @@ import { getKey } from "../utils/myFunctions";
 
 export default function Home() {
   const { selectedCategory } = useAppContext();
-  const [objs, setObjs] = useState(homePagePlaceholder.items);
+  const [objects, setObjects] = useState(homePagePlaceholder.items);
   useEffect(() => {
     document.title = "Vi-Stream";
-    setObjs(homePagePlaceholder.items);
+    setObjects(homePagePlaceholder.items);
     FetchAPI(
       `search?part=snippet&q=${selectedCategory}&order=date&maxResults=50`,
     )
       .then(({ data }) => {
         if (data?.items) {
-          setObjs(data?.items);
-        } else setObjs([]);
+          setObjects(data?.items);
+        } else setObjects([]);
       })
       .catch(() => {});
   }, [selectedCategory]);
@@ -27,7 +27,7 @@ export default function Home() {
       <Sidebar />
       <div className="container">
         <div className="row">
-          {objs.map((obj, index) => (
+          {objects.map((obj, index) => (
             <Card obj={obj} channelOn={true} key={getKey(obj, index)} />
           ))}
         </div>

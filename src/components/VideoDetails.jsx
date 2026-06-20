@@ -164,17 +164,17 @@ export default function VideoDetails() {
   const id = searchParams.get("v");
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
-  const [vidDetails, setVidDetails] = useState([]);
-  const [suggestedVids, setSuggestedVids] = useState([]);
-  const [noVidFound, setNoVidFound] = useState(false);
-  const [cmnts, setCmnts] = useState([]);
+  const [videoDetails, setVideoDetails] = useState([]);
+  const [suggestedVideos, setSuggestedVideos] = useState([]);
+  const [noVideoFound, setNoVideoFound] = useState(false);
+  const [comments, setComments] = useState([]);
   const [channel, setChannel] = useState({});
   const [subscriber, setSubscriber] = useState("");
-  const [descOpen, setDescOpen] = useState(false);
-  const [descLen, setDescLen] = useState(false);
+  const [descriptionOpen, setDescriptionOpen] = useState(false);
+  const [descriptionLength, setDescriptionLength] = useState(false);
   const windowWidth = useWindowWidth();
   const navigate = useNavigate();
-  const [chnlImgSrc, setChnlImgSrc] = useState("");
+  const [channelImgSrc, setChannelImgSrc] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -184,14 +184,15 @@ export default function VideoDetails() {
       FetchAPI("videos?part=contentDetails,snippet,statistics&id=" + id)
         .then(({ data }) => {
           if (data?.items) {
-            setVidDetails(data?.items);
+            setVideoDetails(data?.items);
             document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
-            setDescLen(data?.items?.[0]?.snippet?.description?.length <= 323);
+            setDescriptionLength(
+              data?.items?.[0]?.snippet?.description?.length <= 323,
+            );
             FetchAPI(
               `channels?part=snippet,statistics&id=${data?.items[0]?.snippet?.channelId}`,
             )
               .then((respns) => {
-                //console.log(respns)
                 const items = respns?.data?.items?.[0];
                 setChannel(items);
                 const subs = Number.parseInt(
@@ -199,7 +200,7 @@ export default function VideoDetails() {
                 );
                 setSubscriber(subs > 999 ? roundSubsAndLikes(subs) : subs);
                 loadImage(items?.snippet?.thumbnails?.medium?.url)
-                  .then((resp) => setChnlImgSrc(resp))
+                  .then((resp) => setChannelImgSrc(resp))
                   .catch(() => {});
               })
               .catch(() => {});
@@ -207,13 +208,13 @@ export default function VideoDetails() {
           setLoading(false);
         })
         .catch(() => {
-          setNoVidFound(true);
+          setNoVideoFound(true);
           setLoading(false);
         });
       const getComments = () => {
         FetchAPI(`commentThreads?part=snippet&videoId=${id}&maxResults=100`)
           .then(({ data }) => {
-            setCmnts(data?.items ? data?.items : []);
+            setComments(data?.items ? data?.items : []);
           })
           .catch(() => {});
       };
@@ -253,7 +254,7 @@ export default function VideoDetails() {
       )}
       {loading ? (
         <LoadingSpinner />
-      ) : noVidFound ? (
+      ) : noVideoFound ? (
         <div className="no-video-found">
           <div className="d-flex align-items-center flex-column">
             <img
@@ -293,19 +294,19 @@ export default function VideoDetails() {
                 url={`https://www.youtube.com/watch?v=${id}`}
               />
             </div>
-            {vidDetails?.length > 0 && (
+            {videoDetails?.length > 0 && (
               <div>
                 <div className="fw-bold video-heading">
-                  {vidDetails?.[0]?.snippet?.title}
+                  {videoDetails?.[0]?.snippet?.title}
                 </div>
                 <div className="d-flex video-main">
                   <img
                     className="cursor-pointer rounded-circle channel-avatar2"
-                    src={chnlImgSrc}
+                    src={channelImgSrc}
                     alt="logo"
                     onClick={() =>
                       navigate(
-                        `/channels?id=${vidDetails?.[0]?.snippet?.channelId}`,
+                        `/channels?id=${videoDetails?.[0]?.snippet?.channelId}`,
                       )
                     }
                   />
@@ -314,11 +315,11 @@ export default function VideoDetails() {
                       className="fw-bold cursor-pointer channel-name"
                       onClick={() =>
                         navigate(
-                          `/channels?id=${vidDetails?.[0]?.snippet?.channelId}`,
+                          `/channels?id=${videoDetails?.[0]?.snippet?.channelId}`,
                         )
                       }
                     >
-                      {vidDetails?.[0]?.snippet?.channelTitle}
+                      {videoDetails?.[0]?.snippet?.channelTitle}
                     </div>
                     {subscriber && (
                       <span className="subscriber-count">
@@ -332,15 +333,16 @@ export default function VideoDetails() {
                   >
                     <i className="bi bi-hand-thumbs-up icon-lg"></i>
                     <span className="likes-count">
-                      {Number.parseInt(vidDetails?.[0]?.statistics?.likeCount) >
-                      999
+                      {Number.parseInt(
+                        videoDetails?.[0]?.statistics?.likeCount,
+                      ) > 999
                         ? roundSubsAndLikes(
                             Number.parseInt(
-                              vidDetails?.[0]?.statistics?.likeCount,
+                              videoDetails?.[0]?.statistics?.likeCount,
                             ),
                             true,
                           )
-                        : vidDetails?.[0]?.statistics?.likeCount}
+                        : videoDetails?.[0]?.statistics?.likeCount}
                     </span>
                     <span className="fw-normal separator">|</span>
                     <i className="bi bi-hand-thumbs-down icon-lg"></i>
@@ -348,46 +350,46 @@ export default function VideoDetails() {
                 </div>
                 <div className="description-box">
                   <div
-                    className={`description-body ${!descOpen ? "description-body--collapsed" : ""}`}
+                    className={`description-body ${!descriptionOpen ? "description-body--collapsed" : ""}`}
                   >
                     <span className="fw-bold">
                       {Number.parseInt(
-                        vidDetails?.[0]?.statistics?.viewCount,
+                        videoDetails?.[0]?.statistics?.viewCount,
                       )?.toLocaleString()}{" "}
                       {t("views", "views")}
                       {` ${currLangCode === "fr" ? t("ago", "il y a ") : ""}`}{" "}
                       <SetTimePassed
                         date={
                           new Date(
-                            Date.parse(vidDetails?.[0]?.snippet?.publishedAt),
+                            Date.parse(videoDetails?.[0]?.snippet?.publishedAt),
                           )
                         }
                       />{" "}
                       {` ${currLangCode !== "fr" ? t("ago", "ago") : ""} `}
                     </span>{" "}
                     <br />
-                    {vidDetails?.[0]?.snippet?.description}
+                    {videoDetails?.[0]?.snippet?.description}
                     <br />
                     <br />
                     <button
-                      className={`bg-transparent fw-bold border-0 ${descLen || !descOpen ? "d-none" : ""} `}
-                      onClick={() => setDescOpen(false)}
+                      className={`bg-transparent fw-bold border-0 ${descriptionLength || !descriptionOpen ? "d-none" : ""} `}
+                      onClick={() => setDescriptionOpen(false)}
                     >
                       {t("showLess", "Show less")}
                     </button>
                   </div>
                   <button
-                    className={`bg-transparent fw-bold border-0 ${descLen || descOpen ? "d-none" : ""}`}
-                    onClick={() => setDescOpen(true)}
+                    className={`bg-transparent fw-bold border-0 ${descriptionLength || descriptionOpen ? "d-none" : ""}`}
+                    onClick={() => setDescriptionOpen(true)}
                   >
                     ... {t("more", "more")}
                   </button>
                 </div>
               </div>
             )}
-            {cmnts?.length > 0 && (
+            {comments?.length > 0 && (
               <div className="comments-section">
-                {cmnts?.map((obj) => (
+                {comments?.map((obj) => (
                   <Comment
                     key={obj?.id}
                     obj={obj?.snippet?.topLevelComment?.snippet}
@@ -397,8 +399,8 @@ export default function VideoDetails() {
             )}
           </div>
           <div className="right-column">
-            {suggestedVids?.length > 0 &&
-              suggestedVids?.map((obj, idx) => (
+            {suggestedVideos?.length > 0 &&
+              suggestedVideos?.map((obj, idx) => (
                 <VideoCard det={{ obj, idx }} key={obj?.id?.videoId} />
               ))}
           </div>
