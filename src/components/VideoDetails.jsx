@@ -189,7 +189,13 @@ export default function VideoDetails() {
   const fetchSuggestedVideos = (title) => {
     FetchAPI(`search?part=snippet&q=${title}&order=date&maxResults=50`)
       .then((respns) => {
-        setSuggestedVideos(respns?.data?.items ?? []);
+        const data = respns?.data?.items ?? [];
+        setSuggestedVideos(
+          data.filter(
+            (obj) =>
+              !obj.id?.hasOwnProperty("channelId") && obj.id?.videoId !== id,
+          ),
+        );
       })
       .catch(() => {});
   };
