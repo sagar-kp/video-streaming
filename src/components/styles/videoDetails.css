@@ -35,6 +35,11 @@
   width: 40%;
 }
 
+.video-thumbnail {
+  border-radius: 7px;
+  width: 100%;
+}
+
 /* Meta column */
 .meta-col {
   flex: 60%;
@@ -52,6 +57,8 @@
 .channel-link--small {
   font-size: 12.8px;
   padding-top: 3px;
+  text-decoration-line: none;
+  color: inherit;
 }
 .dot-neg {
   margin-top: -5px;
@@ -76,6 +83,10 @@
 }
 .comment-text {
   font-size: small;
+}
+.comment-text a {
+  text-decoration-line: none;
+  color: inherit;
 }
 .comment-body {
   margin-top: 5px;
@@ -158,6 +169,9 @@
 }
 .channel-name {
   margin-bottom: -5px;
+  display: block;
+  color: inherit;
+  text-decoration-line: none;
 }
 
 /* Subscriber & likes */

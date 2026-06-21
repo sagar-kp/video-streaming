@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Logo } from "../assets";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import cookies from "js-cookie";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
@@ -36,33 +36,37 @@ export default function Navbar() {
     <>
       {count > 1 && globalThis?.location?.pathname !== "/" && <ProgressBar />}
       <div className={`navbar-fixed`}>
-        <i
-          className={`bi bi-list navbar-ham_icon ${
-            windowWidth >= 500 ? "navbar-ham-margin" : ""
-          }`}
+        <button
+          className="ham_button"
           onClick={() => {
             setNavToggle((prev) => !prev);
             if (open) setOpen(false);
           }}
-        ></i>
-        <img
-          className={`logo ${
-            windowWidth < 500 ? "logo-small" : "logo-large"
-          } ${windowWidth >= 500 ? "logo-padding" : ""}`}
-          src={Logo}
-          alt="logo"
+        >
+          <i
+            className={`bi bi-list navbar-ham_icon ${
+              windowWidth >= 500 ? "navbar-ham-margin" : ""
+            }`}
+          ></i>
+        </button>
+        <Link
+          to="/"
           onClick={() => {
-            navigate("/");
             if (open) setOpen(false);
           }}
-        />
+        >
+          <img
+            className={`logo ${
+              windowWidth < 500 ? "logo-small" : "logo-large"
+            } ${windowWidth >= 500 ? "logo-padding" : ""}`}
+            src={Logo}
+            alt="logo"
+          />
+        </Link>
         <div
           className={`d-flex search-wrap ${
             windowWidth < 500 ? "small" : "large"
           }`}
-          onClick={() => {
-            if (open) setOpen(false);
-          }}
         >
           <input
             className={`border-0 search-input ${
@@ -70,6 +74,7 @@ export default function Navbar() {
             }`}
             placeholder={t("search", "Search")}
             value={inputValue}
+            onMouseDown={() => setOpen(false)}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter" && inputValue?.length > 1)
@@ -81,6 +86,7 @@ export default function Navbar() {
               windowWidth < 500 ? "small" : "large"
             }`}
             onClick={() => {
+              setOpen(false);
               navigate(`/results?query=${inputValue}`);
             }}
           >
@@ -88,10 +94,9 @@ export default function Navbar() {
           </button>
         </div>
         <div className="nav-actions">
-          <i
-            className="bi bi-translate translate-icon"
-            onClick={() => setOpen(!open)}
-          ></i>
+          <button className="translate-button" onClick={() => setOpen(!open)}>
+            <i className="bi bi-translate translate-icon"></i>
+          </button>
           {open && (
             <div
               className={`navbar-dropdown ${
@@ -99,10 +104,12 @@ export default function Navbar() {
               }`}
             >
               <div className="d-flex align-items-center lang-div">
-                <i
-                  className="bi bi-arrow-left dropdown-back"
+                <button
+                  className="dropdown-back-button"
                   onClick={() => setOpen(false)}
-                ></i>
+                >
+                  <i className="bi bi-arrow-left dropdown-back"></i>
+                </button>
                 {t("chsLang", "Choose Your Language")}
               </div>
               <hr />
@@ -111,12 +118,14 @@ export default function Navbar() {
                   <li
                     className="cursor-pointer list-unstyled lang-item"
                     key={objKey}
-                    onClick={() => {
-                      i18next?.changeLanguage(objKey);
-                      setOpen(false);
-                    }}
                   >
-                    <div className="lang-row">
+                    <button
+                      onClick={() => {
+                        i18next?.changeLanguage(objKey);
+                        setOpen(false);
+                      }}
+                      className="lang-row"
+                    >
                       <div className="check-wrap">
                         <i
                           className={`bi bi-check2 check-icon ${
@@ -125,7 +134,7 @@ export default function Navbar() {
                         ></i>
                       </div>
                       <div className="lang-text">{langCodes?.[objKey]}</div>
-                    </div>
+                    </button>
                   </li>
                 ))}
               </ul>

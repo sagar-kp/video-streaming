@@ -27,8 +27,8 @@ export default function Home() {
       <Sidebar />
       <div className="container">
         <div className="row">
-          {objects.map((obj, index) => (
-            <Card obj={obj} channelOn={true} key={getKey(obj, index)} />
+          {objects.map((obj) => (
+            <Card obj={obj} channelOn={true} key={getKey(obj)} />
           ))}
         </div>
       </div>

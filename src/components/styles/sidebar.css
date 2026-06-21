@@ -14,10 +14,13 @@
 }
 
 .sidebar-icon_btn_div {
+  all: unset;
   display: flex;
   padding: 8px;
   cursor: pointer;
   border-radius: 10px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .sidebar-icon_btn_div:hover {

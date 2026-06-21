@@ -56,7 +56,6 @@ export default function PlaylistDetails() {
             ),
           )?.toDateString();
           date = date?.slice(4, 10) + "," + date?.slice(11);
-          //console.log(date, diff)
           setUpdated(date);
         } else setUpdated(null);
       })
@@ -95,7 +94,7 @@ export default function PlaylistDetails() {
             )}
           </div>
           <div
-            className={`right-panel ${windowWidth > 1080 ? "70%" : "layout-wide"}`}
+            className={`right-panel ${windowWidth > 1080 ? "layout-wide" : ""}`}
           >
             {playlistVids?.map((obj, idx) => (
               <VideoCard key={obj?.id} det={{ obj, idx }} />
