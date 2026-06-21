@@ -2,7 +2,12 @@
 .sidebar {
   padding: 8px;
 }
-
+@media (min-height: 645px) {
+  .sticky-sidebar {
+    position: sticky;
+    top: 70px;
+  }
+}
 /* Explore title */
 .explore-title {
   font-size: 19px;

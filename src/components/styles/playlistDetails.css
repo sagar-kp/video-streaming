@@ -10,6 +10,8 @@
   border-radius: 17px;
   margin-top: 2%;
   background-color: rgb(48, 17, 114);
+  position: sticky;
+  top: 85px;
 }
 
 .left-panel-wide {
