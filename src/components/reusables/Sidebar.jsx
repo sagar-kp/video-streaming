@@ -24,32 +24,34 @@ export default function Sidebar({ marginTopFromProps }) {
       } ${windowWidth < 600 && navToggle ? "d-none" : ""} sidebar`}
       style={marginTopFromProps ? { marginTop: marginTopFromProps } : {}}
     >
-      <span className={`${showItems ? "d-block" : "d-none"} explore-title`}>
-        {t("explore", "Explore")}
-      </span>
-      {explore.map((obj, index) => (
-        <button
-          className={`sidebar-icon_btn_div ${
-            showItems ? "" : "flex-column text-center"
-          } ${
-            selectedCategory === obj?.searchTerm && pathname === "/"
-              ? "selected-cat"
-              : ""
-          }`}
-          key={obj.name}
-          onClick={() => {
-            setSelectedCategory(obj?.searchTerm);
-            navigate("/");
-          }}
-        >
-          <div className={`${showItems ? "icon-padding" : ""}`}>
-            {obj?.icon}
-          </div>
-          <div className={`${showItems ? "" : "label-small"}`}>
-            {t(obj?.name?.toLowerCase()?.split(" ")?.join("_"), obj?.name)}
-          </div>
-        </button>
-      ))}
+      <div className="sticky-sidebar">
+        <span className={`${showItems ? "d-block" : "d-none"} explore-title`}>
+          {t("explore", "Explore")}
+        </span>
+        {explore.map((obj) => (
+          <button
+            className={`sidebar-icon_btn_div ${
+              showItems ? "" : "flex-column text-center"
+            } ${
+              selectedCategory === obj?.searchTerm && pathname === "/"
+                ? "selected-cat"
+                : ""
+            }`}
+            key={obj.name}
+            onClick={() => {
+              setSelectedCategory(obj?.searchTerm);
+              navigate("/");
+            }}
+          >
+            <div className={`${showItems ? "icon-padding" : ""}`}>
+              {obj?.icon}
+            </div>
+            <div className={`${showItems ? "" : "label-small"}`}>
+              {t(obj?.name?.toLowerCase()?.split(" ")?.join("_"), obj?.name)}
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
