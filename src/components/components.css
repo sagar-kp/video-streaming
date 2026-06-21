@@ -24,6 +24,8 @@
   display: -webkit-box;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-decoration-line: none;
+  color: inherit;
 }
 
 /* Video Details */

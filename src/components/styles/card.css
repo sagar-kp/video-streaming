@@ -24,6 +24,11 @@
 }
 
 /* Channel / description when channelOn */
+.channel-link {
+  text-decoration-line: none;
+  color: inherit;
+  margin-top: 0;
+}
 .channel-desc-default {
   font-size: 14.4px;
 }
@@ -35,6 +40,9 @@
 .playlist-link {
   cursor: pointer;
   font-size: 14.4px;
+  text-decoration-line: none;
+  color: inherit;
+  margin-top: 0;
 }
 
 /* Video meta / time passed */

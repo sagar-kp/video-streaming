@@ -1,22 +1,19 @@
 import SetTimePassed from "../SetTimePassed";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
-import { getNavigatePath, loadImage } from "../../utils/myFunctions";
+import { getKey, getNavigatePath, loadImage } from "../../utils/myFunctions";
 import { useEffect, useState } from "react";
 import { Loading, notFound } from "../../assets";
 import "../styles/card.css";
+import PropTypes from "prop-types";
 
 export default function Card({ obj, channelOn }) {
-  const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(null);
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
   const isPathnameChannels = globalThis.location?.pathname === "/channels";
-  const handleClick = () => {
-    const id = obj?.id?.videoId || obj?.id?.playlistId || obj?.id?.channelId;
-    if (id?.length) navigate(getNavigatePath(obj));
-  };
+  const link = getNavigatePath(obj);
   useEffect(() => {
     const url = obj?.snippet?.thumbnails?.medium?.url;
     if (url?.length)
@@ -29,60 +26,56 @@ export default function Card({ obj, channelOn }) {
   }, [obj]);
   return (
     <div
-      key={
-        obj?.id?.hasOwnProperty("videoId")
-          ? obj?.id?.videoId
-          : obj?.id?.hasOwnProperty("playlistId")
-            ? obj?.id?.playlistId
-            : obj?.id?.channelId
-      }
+      key={getKey(obj)}
       className={`col-md-4 col-xl-${channelOn ? "4" : "3"} col-xxl-2 col-lg-${
         channelOn ? "4" : "3"
       } col-sm-6 col-xs-6 col-xxs-12 p-2`}
     >
-      <div className={`${obj?.id?.channelId ? "text-center" : ""}`}>
+      <Link
+        to={link}
+        className={`${obj?.id?.channelId ? "text-center d-block" : ""}`}
+      >
         <img
-          className={`cursor-pointer ${!imgSrc ? "fade-animation" : ""} card-image ${
+          className={`cursor-pointer ${imgSrc ? "" : "fade-animation"} card-image ${
             obj?.id?.channelId ? "card-img-channel" : ""
           }`}
           src={imgSrc ?? Loading}
           alt="thumbnails"
-          onClick={handleClick}
         />
-      </div>
-      <div
+      </Link>
+      <Link
         className={`videos-title fw-bold cursor-pointer ${obj?.id?.channelId ? "text-center" : ""} card-title ${
           isPathnameChannels ? "card-title-channels" : "card-title-default"
         }`}
-        onClick={handleClick}
+        to={link}
       >
         {obj?.snippet?.title}
-      </div>
+      </Link>
       {channelOn && (
-        <div
-          className={`cursor-pointer ${obj?.id?.channelId ? "videos-title" : "over"} ${
+        <Link
+          className={`cursor-pointer channel-link ${obj?.id?.channelId ? "videos-title" : "over"} ${
             isPathnameChannels
               ? "channel-desc-channels"
               : "channel-desc-default"
           }`}
-          onClick={() => navigate(`/channels?id=${obj?.snippet?.channelId}`)}
+          to={`/channels?id=${obj?.snippet?.channelId}`}
         >
           {obj?.id?.channelId
             ? obj?.snippet?.description
             : obj?.snippet?.channelTitle}
-        </div>
+        </Link>
       )}
       {obj?.id?.playlistId && (
-        <div
+        <Link
           className="playlist-link"
-          onClick={() => navigate(`/playlist?list=${obj?.id?.playlistId}`)}
+          to={`/playlist?list=${obj?.id?.playlistId}`}
         >
           {isPathnameChannels
             ? t("viewFullPL", "View full playlist")
             : t("viewFullPL", "VIEW FULL PLAYLIST")?.toUpperCase()}
-        </div>
+        </Link>
       )}
-      {obj?.id?.videoId && (
+      {obj?.id?.videoId && obj?.snippet?.publishedAt && (
         <div
           className={`card-time ${
             isPathnameChannels ? "card-time-channels" : "card-time-default"
@@ -99,3 +92,26 @@ export default function Card({ obj, channelOn }) {
     </div>
   );
 }
+
+Card.propTypes = {
+  obj: PropTypes.shape({
+    id: PropTypes.shape({
+      videoId: PropTypes.string,
+      playlistId: PropTypes.string,
+      channelId: PropTypes.string,
+    }),
+    snippet: PropTypes.shape({
+      thumbnails: PropTypes.shape({
+        medium: PropTypes.shape({
+          url: PropTypes.string,
+        }),
+      }),
+      title: PropTypes.string,
+      description: PropTypes.string,
+      channelTitle: PropTypes.string,
+      publishedAt: PropTypes.string,
+      channelId: PropTypes.string,
+    }),
+  }),
+  channelOn: PropTypes.bool,
+};

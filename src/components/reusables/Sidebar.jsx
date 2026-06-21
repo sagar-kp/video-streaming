@@ -5,6 +5,7 @@ import "../components.css";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "../../context/AppContext";
 import "../styles/sidebar.css";
+import PropTypes from "prop-types";
 
 export default function Sidebar({ marginTopFromProps }) {
   const { navToggle, selectedCategory, setSelectedCategory } = useAppContext();
@@ -27,7 +28,7 @@ export default function Sidebar({ marginTopFromProps }) {
         {t("explore", "Explore")}
       </span>
       {explore.map((obj, index) => (
-        <div
+        <button
           className={`sidebar-icon_btn_div ${
             showItems ? "" : "flex-column text-center"
           } ${
@@ -35,7 +36,7 @@ export default function Sidebar({ marginTopFromProps }) {
               ? "selected-cat"
               : ""
           }`}
-          key={index}
+          key={obj.name}
           onClick={() => {
             setSelectedCategory(obj?.searchTerm);
             navigate("/");
@@ -47,8 +48,12 @@ export default function Sidebar({ marginTopFromProps }) {
           <div className={`${showItems ? "" : "label-small"}`}>
             {t(obj?.name?.toLowerCase()?.split(" ")?.join("_"), obj?.name)}
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );
 }
+
+Sidebar.propTypes = {
+  marginTopFromProps: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};

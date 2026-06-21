@@ -1,33 +1,28 @@
 import { useTranslation } from "react-i18next";
 import cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 const setTimePassed = (date) => {
-  const now = new Date();
-  const ms = now - date;
-  let val;
-  if (ms / 1000 >= 1 && ms / 1000 < 60) {
-    val = Math.floor(ms / 1000);
-    return `${val} second${val === 1 ? "" : "s"}`;
-  } else if (ms / 60000 >= 1 && ms / 60000 < 60) {
-    val = Math.floor(ms / 60000);
-    return `${val} minute${val === 1 ? "" : "s"}`;
-  } else if (ms / 3600000 >= 1 && ms / 3600000 < 24) {
-    val = Math.floor(ms / (3600 * 1000));
-    return `${val} hour${val === 1 ? "" : "s"}`;
-  } else if (ms / (3600000 * 24) >= 1 && ms / (3600 * 24 * 1000) < 30) {
-    val = Math.floor(ms / (3600 * 24 * 1000));
-    return `${val} day${val === 1 ? "" : "s"}`;
-  } else if (
-    ms / (3600 * 1000 * 24 * 30) >= 1 &&
-    ms / (3600 * 24 * 1000 * 30) < 12
-  ) {
-    val = Math.floor(ms / (3600 * 24 * 30 * 1000));
-    return `${val} month${val === 1 ? "" : "s"}`;
-  } else if (ms / (3600 * 1000 * 24 * 30 * 12) >= 1) {
-    val = Math.floor(ms / (3600 * 24 * 30 * 1000 * 12));
-    return `${val} year${val === 1 ? "" : "s"}`;
+  if (!date || !(date instanceof Date)) return null;
+
+  const ms = Date.now() - date.getTime();
+  const units = [
+    { name: "year", ms: 1000 * 60 * 60 * 24 * 30 * 12 },
+    { name: "month", ms: 1000 * 60 * 60 * 24 * 30 },
+    { name: "day", ms: 1000 * 60 * 60 * 24 },
+    { name: "hour", ms: 1000 * 60 * 60 },
+    { name: "minute", ms: 1000 * 60 },
+    { name: "second", ms: 1000 },
+  ];
+
+  for (const unit of units) {
+    if (ms >= unit.ms) {
+      const val = Math.floor(ms / unit.ms);
+      return { num: val, unit: unit.name, plural: val !== 1 };
+    }
   }
+  return { num: 0, unit: "second", plural: false };
 };
 
 const SetTimePassed = ({ date }) => {
@@ -36,22 +31,33 @@ const SetTimePassed = ({ date }) => {
   const currLangCode = cookies.get("i18next") || "en";
 
   useEffect(() => {
-    const timePassed = setTimePassed(date);
-    const [num, name] = timePassed?.split(" ") ?? [];
-    if (name?.charAt(name?.length - 1) === "s") {
-      setReturnData(
-        num +
-          " " +
-          t(name?.slice(0, name?.length - 1)) +
-          (currLangCode === "hi" || (currLangCode === "fr" && name === "months")
-            ? ""
-            : "s"),
-      );
-    } else {
-      setReturnData(num + " " + t(name, name));
+    const res = setTimePassed(date);
+    if (!res) {
+      setReturnData("");
+      return;
     }
-  }, [currLangCode]);
+
+    const { num, unit, plural } = res;
+
+    // languages that don't need an appended 's' for the plural form in your app
+    const skipPluralAppend =
+      currLangCode === "hi" || (currLangCode === "fr" && unit === "month");
+
+    // translate singular form; append 's' when needed (and not in skip list)
+    const translated =
+      plural && !skipPluralAppend
+        ? `${t(unit, unit)}s` // keep existing translation keys pattern
+        : t(unit, unit);
+
+    // french uses "il y a" before the value — caller composes that, so return only the value+unit
+    setReturnData(`${num} ${translated}`);
+  }, [date, currLangCode, t]);
+
   return <>{returnData}</>;
 };
 
 export default SetTimePassed;
+
+SetTimePassed.propTypes = {
+  date: PropTypes.instanceOf(Date),
+};

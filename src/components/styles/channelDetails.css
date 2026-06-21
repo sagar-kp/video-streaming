@@ -1,11 +1,13 @@
 /* Channel Details */
 
 .channelDet-options {
+  all: unset;
   cursor: pointer;
   font-weight: bold;
   color: rgb(107, 107, 107);
   padding: 1%;
   font-size: 14.3px;
+  box-sizing: border-box;
 }
 
 .channelDet-options:hover {
@@ -127,6 +129,7 @@
 /* Video / card related */
 .video-title {
   font-size: 14px;
+  color: inherit;
 }
 
 .video-meta {
@@ -154,6 +157,8 @@
   font-size: 12px;
   border: 0;
   background: transparent;
+  color: inherit;
+  text-decoration-line: none;
 }
 
 /* Empty states */

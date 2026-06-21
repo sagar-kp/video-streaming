@@ -11,7 +11,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i1",
       },
       snippet: {
         publishedAt: "",
@@ -44,7 +44,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i2",
       },
       snippet: {
         publishedAt: "",
@@ -77,7 +77,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i3",
       },
       snippet: {
         publishedAt: "",
@@ -110,7 +110,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i4",
       },
       snippet: {
         publishedAt: "",
@@ -143,7 +143,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i5",
       },
       snippet: {
         publishedAt: "",
@@ -176,7 +176,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i6",
       },
       snippet: {
         publishedAt: "",
@@ -209,7 +209,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i7",
       },
       snippet: {
         publishedAt: "",
@@ -242,7 +242,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i8",
       },
       snippet: {
         publishedAt: "",
@@ -275,7 +275,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i9",
       },
       snippet: {
         publishedAt: "",
@@ -308,7 +308,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i10",
       },
       snippet: {
         publishedAt: "",
@@ -341,7 +341,7 @@ const homePagePlaceholder = {
       kind: "",
       id: {
         kind: "",
-        videoId: "",
+        videoId: "i11",
       },
       snippet: {
         publishedAt: "",

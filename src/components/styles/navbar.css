@@ -11,6 +11,11 @@
 
 /* Hamburger icon */
 
+.ham_button,
+.translate-button,
+.dropdown-back-button {
+  all: unset;
+}
 .navbar-ham-margin {
   margin-left: 10px;
 }
@@ -107,7 +112,8 @@
   box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.2);
 }
 .navbar-dropdown i:hover,
-.navbar-dropdown li:hover {
+.navbar-dropdown li:hover,
+.dropdown-back-button:hover {
   background-color: rgba(235, 238, 238);
 }
 .navbar-dropdown hr {
@@ -128,12 +134,18 @@
 }
 
 /* Dropdown header/back */
+.dropdown-back-button {
+  padding: 0 2%;
+  font-size: x-large;
+  margin: 0 12px 0 15px;
+  border-radius: 50%;
+}
 .dropdown-back {
   padding: 0 2%;
   font-size: x-large;
-  margin: 0 5%;
   cursor: pointer;
   border-radius: 50%;
+  height: 100%;
 }
 
 /* Language list */
@@ -148,16 +160,23 @@
 
 /* Lang item layout */
 .lang-row {
+  all: unset;
+  margin: 3% 10px;
+  width: 95%;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
 }
 .check-wrap {
   flex: 20%;
   text-align: center;
+  cursor: pointer;
 }
 .lang-text {
-  flex: 80%;
+  flex: 78%;
   font-size: 15px;
+  cursor: pointer;
 }
 
 /* Check icon */

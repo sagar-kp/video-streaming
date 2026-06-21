@@ -24,11 +24,9 @@ const loadImg = (imageUrl) => {
   });
 };
 
-export const getKey = (obj, index) => {
-  if (!obj?.id?.length) return index;
-  if (obj?.id?.hasOwnProperty("videoId")) return obj?.id?.videoId;
-  if (obj?.id?.hasOwnProperty("playlistId")) return obj.id?.playlistId;
-  return obj?.id?.channelId;
+export const getKey = (obj) => {
+  const id = obj?.id;
+  return id?.videoId || id?.playlistId || id?.channelId;
 };
 
 export const getNavigatePath = (obj) => {
