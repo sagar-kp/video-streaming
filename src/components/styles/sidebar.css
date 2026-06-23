@@ -15,7 +15,7 @@
 }
 
 .selected-cat {
-  background-color: rgb(177, 177, 177);
+  background-color: rgb(177, 177, 177) !important;
 }
 
 .sidebar-icon_btn_div {

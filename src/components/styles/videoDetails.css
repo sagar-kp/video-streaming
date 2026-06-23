@@ -50,15 +50,18 @@
 
 .video-title-small {
   font-size: 14px;
+  line-height: 16px;
 }
 
 /* Channel link and related */
 
 .channel-link--small {
-  font-size: 12.8px;
+  font-size: 10.8px;
   padding-top: 3px;
   text-decoration-line: none;
   color: inherit;
+  display: block;
+  line-height: 14px;
 }
 .dot-neg {
   margin-top: -5px;
@@ -66,7 +69,7 @@
 
 /* Time meta */
 .time-meta {
-  font-size: small;
+  font-size: x-small;
 }
 .time-meta--playlist {
   margin-top: 3px;
