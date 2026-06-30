@@ -10,7 +10,7 @@ import { getSearchResults } from "../services";
 export default function Home() {
   const { selectedCategory } = useAppContext();
   const { data: objects } = useQuery({
-    queryKey: ["selected-category", selectedCategory],
+    queryKey: ["search-results", selectedCategory],
     queryFn: () => getSearchResults(selectedCategory),
   });
   const dataToBeDisplayed = objects?.data?.items ?? homePagePlaceholder.items;

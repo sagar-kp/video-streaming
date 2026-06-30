@@ -7,6 +7,8 @@ const {
   getPlaylistItemsURL,
   getVideoDetailsURL,
   getChannelDetailsURL,
+  getChannelVideosURL,
+  getChannelPlaylistsURL,
   getCommentsURL,
 } = API_CONSTANTS;
 
@@ -28,6 +30,14 @@ export const getVideoDetails = (videoId) => {
 
 export const getChannelDetails = (channelId) => {
   return FetchAPI(getChannelDetailsURL(channelId));
+};
+
+export const getChannelVideos = (channelId) => {
+  return FetchAPI(getChannelVideosURL(channelId));
+};
+
+export const getChannelPlaylists = (channelId, channelTitle) => {
+  return FetchAPI(getChannelPlaylistsURL(channelId, channelTitle));
 };
 
 export const getComments = (videoId) => {

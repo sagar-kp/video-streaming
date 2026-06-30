@@ -198,7 +198,7 @@ export default function VideoDetails() {
   });
 
   const { data: suggestedVideosData } = useQuery({
-    queryKey: ["suggested-videos", videoTitle, id],
+    queryKey: ["search-results", videoTitle],
     queryFn: () => getSearchResults(videoTitle),
     enabled: Boolean(videoTitle),
     retry: false,

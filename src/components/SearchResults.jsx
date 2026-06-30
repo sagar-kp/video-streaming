@@ -84,7 +84,7 @@ export default function SearchResults() {
             </div>
             <div className="sr-col-70">
               <Link
-                className={`videos-title cursor-pointer ${windowWidth < 750 ? "sr-title-small" : "sr-title"}`}
+                className={`videos-title cursor-pointer d-block ${windowWidth < 750 ? "sr-title-small" : "sr-title"}`}
                 to={getNavigatePath(obj)}
               >
                 {obj?.snippet?.title}
