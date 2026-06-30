@@ -8,12 +8,9 @@ import useWindowWidth from "../hooks/useWindowWidth";
 import ProgressBar from "./ProgressBar";
 import { useAppContext } from "../context/AppContext";
 import "./styles/navbar.css";
+import APP_CONSTANTS from "../constants/APP_CONSTANTS";
 
-const langCodes = {
-  en: "English",
-  fr: "Français",
-  hi: "हिन्दी",
-};
+const { langCodes } = APP_CONSTANTS;
 
 export default function Navbar() {
   const { setNavToggle } = useAppContext();
