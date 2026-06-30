@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { FetchAPI } from "../utils/apiCalls";
+import { useEffect } from "react";
 import Sidebar from "./reusables/Sidebar";
 import { Link, useSearchParams } from "react-router-dom";
 import useWindowWidth from "../hooks/useWindowWidth";
@@ -8,37 +7,54 @@ import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "./reusables/LoadingSpinner";
 import "./styles/searchResults.css";
-import { getKey, getNavigatePath } from "../utils/myFunctions";
+import { getKey, getNavigatePath, loadImage } from "../utils/myFunctions";
+import { useQuery } from "@tanstack/react-query";
+import { getSearchResults } from "../services";
+import { Loading } from "../assets";
+import PropTypes from "prop-types";
+
+const Img = ({ obj }) => {
+  const imageUrl = obj?.snippet?.thumbnails?.high?.url;
+  const { data: imgSrc } = useQuery({
+    queryKey: ["image", imageUrl],
+    queryFn: () => loadImage(imageUrl),
+    enabled: Boolean(imageUrl),
+    gcTime: 1000 * 60 * 60 * 24,
+    retry: false,
+  });
+  return (
+    <img
+      className={`search-img ${
+        obj?.id?.channelId ? "search-img--channel" : "search-img--default"
+      }`}
+      src={imgSrc ?? Loading}
+      alt="thumbnail"
+    />
+  );
+};
 
 export default function SearchResults() {
-  const [objs, setObjs] = useState([]);
   const [searchParams] = useSearchParams();
   const windowWidth = useWindowWidth();
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
-  const [noResults, setNoResults] = useState(false);
   const query = searchParams.get("query");
-  const [loading, setLoading] = useState(false);
+
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["search-results", query],
+    queryFn: () => getSearchResults(query),
+    enabled: Boolean(query),
+  });
+
+  const objs = data?.data?.items ?? [];
+  const noResults = Boolean(query) && !loading && objs.length === 0;
+
   useEffect(() => {
     if (query) {
       document.title = `${query} - Vi-Stream`;
-      setLoading(true);
-      FetchAPI(`search?part=snippet&q=${query}&order=date&maxResults=50`)
-        .then(({ data }) => {
-          if (data?.items) {
-            setNoResults(false);
-
-            setObjs(data?.items);
-          } else {
-            setNoResults(true);
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    } else setNoResults(true);
+    }
   }, [query]);
+
   if (loading || noResults)
     return (
       <div className="d-flex search-results-container">
@@ -56,27 +72,19 @@ export default function SearchResults() {
     <div className="d-flex search-results-container">
       <Sidebar />
       <div className="sr-results">
-        {objs.map((obj) => (
+        {objs?.map((obj) => (
           <div
             className={`d-flex ${windowWidth < 700 ? "sr-row" : ""}`}
             key={getKey(obj)}
           >
             <div className="search-img_div text-center sr-col-30">
               <Link to={getNavigatePath(obj)}>
-                <img
-                  className={`search-img ${
-                    obj?.id?.channelId
-                      ? "search-img--channel"
-                      : "search-img--default"
-                  }`}
-                  src={obj?.snippet?.thumbnails?.high?.url}
-                  alt="thumbnail"
-                />
+                <Img obj={obj} />
               </Link>
             </div>
             <div className="sr-col-70">
               <Link
-                className={`videos-title cursor-pointer ${windowWidth < 750 ? "sr-title-small" : "sr-title"}`}
+                className={`videos-title cursor-pointer d-block ${windowWidth < 750 ? "sr-title-small" : "sr-title"}`}
                 to={getNavigatePath(obj)}
               >
                 {obj?.snippet?.title}
@@ -118,3 +126,18 @@ export default function SearchResults() {
     </div>
   );
 }
+
+Img.propTypes = {
+  obj: PropTypes.shape({
+    id: PropTypes.shape({
+      channelId: PropTypes.string,
+    }),
+    snippet: PropTypes.shape({
+      thumbnails: PropTypes.shape({
+        high: PropTypes.shape({
+          url: PropTypes.string,
+        }),
+      }),
+    }),
+  }).isRequired,
+};

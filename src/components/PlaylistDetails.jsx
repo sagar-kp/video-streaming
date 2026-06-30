@@ -1,6 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { FetchAPI } from "../utils/apiCalls";
+import { useEffect, useMemo, useState } from "react";
 import useWindowWidth from "../hooks/useWindowWidth";
 import Sidebar from "./reusables/Sidebar";
 import { VideoCard } from "./VideoDetails";
@@ -9,6 +8,8 @@ import cookies from "js-cookie";
 import { loadImage } from "../utils/myFunctions";
 import LoadingSpinner from "./reusables/LoadingSpinner";
 import { Loading } from "../assets";
+import { useQuery } from "@tanstack/react-query";
+import { getPlaylistById, getPlaylistItems } from "../services";
 import "./styles/playlistDetails.css";
 
 export default function PlaylistDetails() {
@@ -17,50 +18,65 @@ export default function PlaylistDetails() {
   const currLangCode = cookies.get("i18next") || "en";
   const list = searchParams.get("list");
   const windowWidth = useWindowWidth();
-  const [playlist, setPlaylist] = useState({});
-  const [playlistVids, setPlaylistVids] = useState([]);
   const [updated, setUpdated] = useState(null);
-  const [imgSrc, setImgSrc] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const { data: playlistData, isLoading: loading } = useQuery({
+    queryKey: ["playlist", list],
+    queryFn: () => getPlaylistById(list),
+    enabled: Boolean(list),
+  });
+
+  const { data: playlistItemsData } = useQuery({
+    queryKey: ["playlist-items", list],
+    queryFn: () => getPlaylistItems(list),
+    enabled: Boolean(list),
+  });
+
+  const playlist = useMemo(
+    () => playlistData?.data?.items?.[0] ?? {},
+    [playlistData],
+  );
+  const playlistVideos = useMemo(
+    () => playlistItemsData?.data?.items ?? [],
+    [playlistItemsData],
+  );
+
+  const imageUrl = playlist?.snippet?.thumbnails?.medium?.url;
+
+  const { data: imgSrc } = useQuery({
+    queryKey: ["playlist-image", imageUrl],
+    queryFn: () => loadImage(imageUrl),
+    enabled: Boolean(imageUrl),
+    gcTime: 1000 * 60 * 60 * 24,
+    retry: false,
+  });
 
   useEffect(() => {
     document.title = "Vi-Stream";
-    setLoading(true);
-    FetchAPI(`playlists?part=snippet&id=${list}`)
-      .then(({ data }) => {
-        if (data?.items) {
-          document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
-          setPlaylist(data?.items?.[0]);
-          loadImage(data?.items?.[0]?.snippet?.thumbnails?.medium?.url)
-            .then((resp) => setImgSrc(resp))
-            .catch(() => {});
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
+    if (playlist?.snippet?.title) {
+      document.title = `${playlist.snippet.title} - Vi-Stream`;
+    }
+  }, [playlist]);
+
+  useEffect(() => {
+    if (playlistVideos?.length > 0) {
+      let date = "";
+      let diff = [];
+      playlistVideos?.forEach((obj) => {
+        diff?.push(Date.now() - Date.parse(obj?.snippet?.publishedAt));
       });
-    FetchAPI(`playlistItems?part=snippet&playlistId=${list}&maxResults=50`)
-      .then(({ data }) => {
-        setPlaylistVids(data?.items ? data?.items : []);
-        if (data?.items && data?.items?.length > 0) {
-          let date = "";
-          let diff = [];
-          data?.items?.forEach((obj) => {
-            diff?.push(Date.now() - Date.parse(obj?.snippet?.publishedAt));
-          });
-          date = new Date(
-            Date.parse(
-              data?.items?.[diff?.indexOf(Math.min(...diff))]?.snippet
-                ?.publishedAt,
-            ),
-          )?.toDateString();
-          date = date?.slice(4, 10) + "," + date?.slice(11);
-          setUpdated(date);
-        } else setUpdated(null);
-      })
-      .catch(() => {});
-  }, [list]);
+      date = new Date(
+        Date.parse(
+          playlistVideos?.[diff?.indexOf(Math.min(...diff))]?.snippet
+            ?.publishedAt,
+        ),
+      )?.toDateString();
+      date = date?.slice(4, 10) + "," + date?.slice(11);
+      setUpdated(date);
+    } else {
+      setUpdated(null);
+    }
+  }, [playlistVideos]);
   return (
     <div className="playlist-container">
       <Sidebar />
@@ -80,9 +96,9 @@ export default function PlaylistDetails() {
             <div className="fw-bold playlist-channel">
               {playlist?.snippet?.channelTitle}
             </div>
-            {playlistVids?.length > 0 && (
+            {playlistVideos?.length > 0 && (
               <div className="d-flex playlist-stats">
-                {playlistVids?.length} {t("videos", "videos")} &nbsp;{" "}
+                {playlistVideos?.length} {t("videos", "videos")} &nbsp;{" "}
                 {updated && (
                   <span>{`${
                     currLangCode === "hi" ? updated : ""
@@ -96,7 +112,7 @@ export default function PlaylistDetails() {
           <div
             className={`right-panel ${windowWidth > 1080 ? "layout-wide" : ""}`}
           >
-            {playlistVids?.map((obj, idx) => (
+            {playlistVideos?.map((obj, idx) => (
               <VideoCard key={obj?.id} det={{ obj, idx }} />
             ))}
           </div>

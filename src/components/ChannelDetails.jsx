@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { FetchAPI } from "../utils/apiCalls";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Sidebar from "./reusables/Sidebar";
 import useWindowWidth from "../hooks/useWindowWidth";
@@ -10,6 +9,13 @@ import { useTranslation } from "react-i18next";
 import cookies from "js-cookie";
 import SetTimePassed from "./SetTimePassed";
 import LoadingSpinner from "./reusables/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getChannelDetails,
+  getChannelPlaylists,
+  getChannelVideos,
+  getVideoDetails,
+} from "../services";
 import "./styles/channelDetails.css";
 import PropTypes from "prop-types";
 
@@ -92,108 +98,124 @@ const UnsubscribedTrailer = ({ unsubscribedTrailer, unsubscribedVideo }) => {
 };
 
 export default function ChannelDetails() {
-  let [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const { t } = useTranslation();
   const currLangCode = cookies.get("i18next") || "en";
-  const [channel, setChannel] = useState({});
   const [selectedOption, setSelectedOption] = useState("");
-  const [date, setDate] = useState(new Date().toString().split(" "));
-  const [videos, setVideos] = useState([]);
-  const [noLive, setNoLive] = useState(false);
-  const [noVideos, setNoVideos] = useState(false);
-  const [noPlaylists, setNoPlaylists] = useState(false);
-  const [live, setLive] = useState([]);
-  const [unsubscribedVideo, setUnsubscribedVideo] = useState({});
-  const [playlists, setPlaylists] = useState([]);
-  const [imgSrc, setImgSrc] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const { data: channelData, isLoading: loading } = useQuery({
+    queryKey: ["channel-details", id],
+    queryFn: () => getChannelDetails(id),
+    enabled: Boolean(id),
+    retry: false,
+  });
+
+  const channel = useMemo(
+    () => channelData?.data?.items?.[0] ?? {},
+    [channelData],
+  );
   const unsubscribedTrailer =
     channel?.brandingSettings?.channel?.unsubscribedTrailer;
 
-  const fetchUnsubscribedTrailer = (unsubscribedTrailer) => {
-    FetchAPI(
-      "videos?part=contentDetails,snippet,statistics&id=" + unsubscribedTrailer,
-    )
-      ?.then((respns) => {
-        setUnsubscribedVideo(
-          respns?.data?.items?.length > 0 ? respns?.data?.items[0] : {},
-        );
-        setSelectedOption("home");
-      })
-      ?.catch(() => {});
-  };
+  const { data: channelVideosData } = useQuery({
+    queryKey: ["channel-videos", id],
+    queryFn: () => getChannelVideos(id),
+    enabled: Boolean(id),
+    retry: false,
+  });
 
-  const fetchPlaylists = (channelData, items) => {
-    FetchAPI(
-      `search?part=id,snippet&type=playlist&channelId=${id}${
-        items?.length > 0 ? `&channel=${items[0]?.snippet?.title}` : ""
-      }&maxResults=100`,
-    )
-      .then(({ data }) => {
-        let arr = [];
-        data?.items?.forEach((obj) => {
-          if (
-            channelData?.items?.length > 0 &&
-            obj?.snippet?.channelTitle === channelData?.items[0]?.snippet?.title
-          )
-            arr?.push(obj);
-        });
-        setPlaylists(arr?.length > 0 ? arr : []);
-        setNoPlaylists(arr?.length === 0);
-      })
-      .catch(() => {});
-  };
+  const rawVideos = useMemo(
+    () => channelVideosData?.data?.items ?? [],
+    [channelVideosData],
+  );
+
+  const videos = useMemo(
+    () =>
+      rawVideos.filter(
+        (obj) =>
+          obj?.id?.hasOwnProperty("videoId") &&
+          obj?.snippet?.liveBroadcastContent === "none",
+      ),
+    [rawVideos],
+  );
+
+  const live = useMemo(
+    () =>
+      rawVideos.filter(
+        (obj) =>
+          obj?.id?.hasOwnProperty("videoId") &&
+          obj?.snippet?.liveBroadcastContent !== "none",
+      ),
+    [rawVideos],
+  );
+
+  const { data: channelPlaylistsData } = useQuery({
+    queryKey: ["channel-playlists", id, channel?.snippet?.title],
+    queryFn: () => getChannelPlaylists(id, channel?.snippet?.title),
+    enabled: Boolean(id && channel?.snippet?.title),
+    retry: false,
+  });
+
+  const playlists = useMemo(() => {
+    const channelTitle = channel?.snippet?.title;
+    if (!channelTitle) return [];
+    return (channelPlaylistsData?.data?.items ?? []).filter(
+      (obj) => obj?.snippet?.channelTitle === channelTitle,
+    );
+  }, [channelPlaylistsData, channel?.snippet?.title]);
+
+  const imageUrl = channel?.snippet?.thumbnails?.medium?.url;
+  const { data: imgSrc } = useQuery({
+    queryKey: ["channel-image", imageUrl],
+    queryFn: () => loadImage(imageUrl),
+    enabled: Boolean(imageUrl),
+    gcTime: 1000 * 60 * 60 * 24,
+    retry: false,
+  });
+
+  const { data: trailerData } = useQuery({
+    queryKey: ["video-details", unsubscribedTrailer],
+    queryFn: () => getVideoDetails(unsubscribedTrailer),
+    enabled: Boolean(unsubscribedTrailer),
+    retry: false,
+  });
+
+  const unsubscribedVideo = useMemo(
+    () => trailerData?.data?.items?.[0] ?? {},
+    [trailerData],
+  );
+
+  const date = useMemo(() => {
+    if (!channel?.snippet?.publishedAt) {
+      return new Date().toString().split(" ");
+    }
+    return new Date(Date.parse(channel.snippet.publishedAt))
+      .toString()
+      .split(" ");
+  }, [channel?.snippet?.publishedAt]);
+
+  const noVideos = videos.length === 0;
+  const noLive = live.length === 0;
+  const noPlaylists = playlists.length === 0;
+  const hasChannelData = Object.keys(channel).length > 0;
+
   useEffect(() => {
     document.title = "Vi-Stream";
-    setLoading(true);
-    FetchAPI(`channels?part=snippet,statistics&id=${id}`)
-      ?.then(({ data }) => {
-        let channelData = data;
-        setChannel(data?.items ? data?.items[0] : []);
-        if (data?.items?.length > 0) {
-          loadImage(data?.items?.[0]?.snippet?.thumbnails?.medium?.url)
-            ?.then((resp) => setImgSrc(resp))
-            ?.catch(() => {});
-          document.title = `${data?.items[0]?.snippet?.title} - Vi-Stream`;
-          const unsubscribedTrailer =
-            data?.items[0]?.brandingSettings?.channel?.unsubscribedTrailer;
-          if (unsubscribedTrailer) {
-            fetchUnsubscribedTrailer(unsubscribedTrailer);
-          }
-          fetchPlaylists(channelData, data?.items);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-    FetchAPI(`search?part=snippet,id&channelId=${id}&order=date&maxResults=50`)
-      .then(({ data }) => {
-        let arr1 = [];
-        let arr2 = [];
-        if (data.items) {
-          const videos = data?.items?.filter((obj) =>
-            obj?.id?.hasOwnProperty("videoId"),
-          );
-          videos.forEach((obj) =>
-            obj?.snippet?.liveBroadcastContent === "none"
-              ? arr1?.push(obj)
-              : arr2?.push(obj),
-          );
-          arr1?.length > 0 ? setVideos(arr1) : setNoVideos(true);
-          arr2?.length > 0 ? setLive(arr2) : setNoLive(true);
-        }
-      })
-      .catch(() => {});
-  }, [id]);
+  }, []);
+
   useEffect(() => {
-    setDate(
-      new Date(Date?.parse(channel?.snippet?.publishedAt))
-        ?.toString()
-        ?.split(" "),
-    );
-  }, [channel]);
+    if (channel?.snippet?.title) {
+      document.title = `${channel.snippet.title} - Vi-Stream`;
+    }
+  }, [channel?.snippet?.title]);
+
+  useEffect(() => {
+    if (unsubscribedTrailer) {
+      setSelectedOption("home");
+    }
+  }, [unsubscribedTrailer]);
+
   if (loading)
     return (
       <div className="d-flex channel-container">
@@ -266,7 +288,7 @@ export default function ChannelDetails() {
             </button>
           ))}
         </div>
-        {selectedOption?.length > 0 && Object.keys(channel)?.length > 0 && (
+        {selectedOption?.length > 0 && hasChannelData && (
           <div className="channel-content">
             {selectedOption === "home" && (
               <div>

@@ -3,27 +3,25 @@ import { Link } from "react-router-dom";
 import cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 import { getKey, getNavigatePath, loadImage } from "../../utils/myFunctions";
-import { useEffect, useState } from "react";
-import { Loading, notFound } from "../../assets";
+import { useQuery } from "@tanstack/react-query";
+import { Loading } from "../../assets";
 import "../styles/card.css";
 import PropTypes from "prop-types";
 
 export default function Card({ obj, channelOn }) {
-  const [imgSrc, setImgSrc] = useState(null);
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
   const isPathnameChannels = globalThis.location?.pathname === "/channels";
   const link = getNavigatePath(obj);
-  useEffect(() => {
-    const url = obj?.snippet?.thumbnails?.medium?.url;
-    if (url?.length)
-      loadImage(obj?.snippet?.thumbnails?.medium?.url)
-        .then((resp) => {
-          setImgSrc(resp);
-        })
-        .catch(() => setImgSrc(notFound));
-    else setImgSrc(null);
-  }, [obj]);
+  const imageUrl = obj?.snippet?.thumbnails?.medium?.url;
+
+  const { data: imgSrc } = useQuery({
+    queryKey: ["image", imageUrl],
+    queryFn: () => loadImage(imageUrl),
+    enabled: Boolean(imageUrl),
+    gcTime: 1000 * 60 * 60 * 24,
+    retry: false,
+  });
   return (
     <div
       key={getKey(obj)}
