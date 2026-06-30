@@ -5,13 +5,13 @@ import { useAppContext } from "../context/AppContext";
 import { homePagePlaceholder } from "../utils/placeholderData";
 import { getKey } from "../utils/myFunctions";
 import { useQuery } from "@tanstack/react-query";
-import { getByCategory } from "../services";
+import { getSearchResults } from "../services";
 
 export default function Home() {
   const { selectedCategory } = useAppContext();
   const { data: objects } = useQuery({
     queryKey: ["selected-category", selectedCategory],
-    queryFn: () => getByCategory(selectedCategory),
+    queryFn: () => getSearchResults(selectedCategory),
   });
   const dataToBeDisplayed = objects?.data?.items ?? homePagePlaceholder.items;
   useEffect(() => {

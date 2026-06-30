@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FetchAPI } from "../utils/apiCalls";
 import useWindowWidth from "../hooks/useWindowWidth";
 import SetTimePassed from "./SetTimePassed";
 import ReactPlayer from "react-player";
@@ -14,6 +13,13 @@ import { useAppContext } from "../context/AppContext";
 import LoadingSpinner from "./reusables/LoadingSpinner";
 import "./styles/videoDetails.css";
 import PropTypes from "prop-types";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getChannelDetails,
+  getComments,
+  getSearchResults,
+  getVideoDetails,
+} from "../services";
 
 export const VideoCard = ({ det: { obj, idx } }) => {
   const windowWidth = useWindowWidth();
@@ -161,77 +167,93 @@ export default function VideoDetails() {
   const id = searchParams.get("v");
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
-  const [videoDetails, setVideoDetails] = useState([]);
-  const [suggestedVideos, setSuggestedVideos] = useState([]);
   const [noVideoFound, setNoVideoFound] = useState(false);
-  const [comments, setComments] = useState([]);
   const [subscriber, setSubscriber] = useState("");
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   const [descriptionLength, setDescriptionLength] = useState(false);
   const windowWidth = useWindowWidth();
   const navigate = useNavigate();
   const [channelImgSrc, setChannelImgSrc] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const fetchChannelData = (channelId) => {
-    FetchAPI(`channels?part=snippet,statistics&id=${channelId}`)
-      .then((respns) => {
-        const items = respns?.data?.items?.[0];
-        const subs = Number.parseInt(items?.statistics?.subscriberCount);
-        setSubscriber(subs > 999 ? roundSubsAndLikes(subs) : subs);
-        loadImage(items?.snippet?.thumbnails?.medium?.url)
-          .then((resp) => setChannelImgSrc(resp))
-          .catch(() => {});
-      })
-      .catch(() => {});
-  };
+  const {
+    data: videoData,
+    isLoading: loading,
+    isError: isVideoError,
+  } = useQuery({
+    queryKey: ["video-details", id],
+    queryFn: () => getVideoDetails(id),
+    enabled: Boolean(id),
+    retry: false,
+  });
 
-  const fetchSuggestedVideos = (title) => {
-    FetchAPI(`search?part=snippet&q=${title}&order=date&maxResults=50`)
-      .then((respns) => {
-        const data = respns?.data?.items ?? [];
-        setSuggestedVideos(
-          data.filter(
-            (obj) =>
-              !obj.id?.hasOwnProperty("channelId") && obj.id?.videoId !== id,
-          ),
-        );
-      })
-      .catch(() => {});
-  };
+  const videoDetails = videoData?.data?.items ?? [];
+  const channelId = videoDetails?.[0]?.snippet?.channelId;
+  const videoTitle = videoDetails?.[0]?.snippet?.title;
+
+  const { data: channelData } = useQuery({
+    queryKey: ["channel-details", channelId],
+    queryFn: () => getChannelDetails(channelId),
+    enabled: Boolean(channelId),
+    retry: false,
+  });
+
+  const { data: suggestedVideosData } = useQuery({
+    queryKey: ["suggested-videos", videoTitle, id],
+    queryFn: () => getSearchResults(videoTitle),
+    enabled: Boolean(videoTitle),
+    retry: false,
+  });
+
+  const suggestedVideos = (suggestedVideosData?.data?.items ?? []).filter(
+    (obj) => !obj.id?.hasOwnProperty("channelId") && obj.id?.videoId !== id,
+  );
+
+  const { data: commentsData } = useQuery({
+    queryKey: ["video-comments", id],
+    queryFn: () => getComments(id),
+    enabled: Boolean(id),
+    retry: false,
+  });
+
+  const comments = commentsData?.data?.items ?? [];
+
   useEffect(() => {
     document.title = "Vi-Stream";
-    if (id) {
-      setLoading(true);
-      FetchAPI("videos?part=contentDetails,snippet,statistics&id=" + id)
-        .then(({ data }) => {
-          if (data?.items) {
-            setVideoDetails(data?.items);
-            document.title = `${data?.items?.[0]?.snippet?.title} - Vi-Stream`;
-            setDescriptionLength(
-              data?.items?.[0]?.snippet?.description?.length <= 323,
-            );
-            fetchChannelData(data?.items[0]?.snippet?.channelId);
-            fetchSuggestedVideos(data?.items?.[0]?.snippet?.title);
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setNoVideoFound(true);
-          setLoading(false);
-        });
-      const getComments = () => {
-        FetchAPI(`commentThreads?part=snippet&videoId=${id}&maxResults=100`)
-          .then(({ data }) => {
-            setComments(data?.items ? data?.items : []);
-          })
-          .catch(() => {});
-      };
-      setTimeout(getComments, 2000);
-    } else {
+    if (!id) {
       navigate("/");
     }
   }, [id, navigate]);
+
+  useEffect(() => {
+    if (videoDetails?.length > 0) {
+      document.title = `${videoDetails[0]?.snippet?.title} - Vi-Stream`;
+      setDescriptionLength(
+        videoDetails[0]?.snippet?.description?.length <= 323,
+      );
+    }
+  }, [videoDetails]);
+
+  useEffect(() => {
+    setNoVideoFound(Boolean(isVideoError));
+  }, [isVideoError]);
+
+  useEffect(() => {
+    const items = channelData?.data?.items?.[0];
+    if (!items) {
+      setSubscriber("");
+      setChannelImgSrc("");
+      return;
+    }
+
+    const subscribers = Number.parseInt(items?.statistics?.subscriberCount);
+    setSubscriber(
+      subscribers > 999 ? roundSubsAndLikes(subscribers) : subscribers,
+    );
+    loadImage(items?.snippet?.thumbnails?.medium?.url)
+      .then((resp) => setChannelImgSrc(resp))
+      .catch(() => setChannelImgSrc(""));
+  }, [channelData]);
+
   useEffect(() => {
     if ((windowWidth >= 600 && navToggle) || (windowWidth < 600 && !navToggle))
       setNavToggle((prev) => !prev);
