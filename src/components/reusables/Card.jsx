@@ -51,7 +51,7 @@ export default function Card({ obj, channelOn }) {
       </Link>
       {channelOn && (
         <Link
-          className={`cursor-pointer channel-link ${obj?.id?.channelId ? "videos-title" : "over"} ${
+          className={`cursor-pointer channel-link d-block ${obj?.id?.channelId ? "videos-title" : "over"} ${
             isPathnameChannels
               ? "channel-desc-channels"
               : "channel-desc-default"

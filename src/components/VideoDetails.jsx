@@ -26,18 +26,65 @@ export const VideoCard = ({ det: { obj, idx } }) => {
   const currLangCode = cookies.get("i18next") || "en";
   const { t } = useTranslation();
   const isPathnamePlaylist = globalThis?.location?.pathname === "/playlist";
-  const [imgSrc, setImgSrc] = useState("");
+  const imageMediumURL = obj?.snippet?.thumbnails?.medium?.url;
 
-  const getThumbnailClassname = () => {
-    if (isPathnamePlaylist) return "thumb--playlist";
-    else if (windowWidth < 1000 && windowWidth > 500) return "thumb--wide";
-    return "thumb--default";
-  };
-  useEffect(() => {
-    loadImage(obj?.snippet?.thumbnails?.medium?.url)
-      .then((resp) => setImgSrc(resp))
-      .catch(() => setImgSrc(notFound));
-  }, [obj]);
+  let thumbnailClassname = "thumb--default";
+  if (isPathnamePlaylist) thumbnailClassname = "thumb--playlist";
+  else if (windowWidth < 1000 && windowWidth > 500)
+    thumbnailClassname = "thumb--wide";
+
+  const isPrivateVideo = obj?.snippet?.title === "Private video";
+  const { data: thumbnailSrc } = useQuery({
+    queryKey: ["image", imageMediumURL],
+    queryFn: () => loadImage(imageMediumURL),
+    enabled: Boolean(imageMediumURL),
+    retry: false,
+    staleTime: 1000 * 60 * 60 * 24,
+    cacheTime: 1000 * 60 * 60 * 24,
+  });
+
+  const imageSection = isPrivateVideo ? (
+    <div className={thumbnailClassname}>
+      <img
+        src={imageMediumURL ? (thumbnailSrc ?? Loading) : notFound}
+        alt="thumbnails"
+        className="video-thumbnail"
+      />
+    </div>
+  ) : (
+    <Link
+      className={thumbnailClassname}
+      to={
+        isPathnamePlaylist
+          ? `/watch?v=${obj?.snippet?.resourceId?.videoId}`
+          : `/watch?v=${obj?.id?.videoId}`
+      }
+    >
+      <img
+        src={imageMediumURL ? (thumbnailSrc ?? Loading) : notFound}
+        alt="thumbnails"
+        className="video-thumbnail"
+      />
+    </Link>
+  );
+
+  const titleSection = isPrivateVideo ? (
+    <div className="videos-title fw-bold video-title-small">
+      {obj?.snippet?.title}
+    </div>
+  ) : (
+    <Link
+      className="videos-title fw-bold cursor-pointer video-title-small"
+      to={
+        isPathnamePlaylist
+          ? `/watch?v=${obj?.snippet?.resourceId?.videoId}`
+          : `/watch?v=${obj?.id?.videoId}`
+      }
+    >
+      {obj?.snippet?.title}
+    </Link>
+  );
+
   return (
     <div
       className={`d-flex ${isPathnamePlaylist ? "video-row--playlist" : "video-row--default"}`}
@@ -50,32 +97,10 @@ export const VideoCard = ({ det: { obj, idx } }) => {
           {idx + 1}
         </div>
       )}
-      <Link
-        className={getThumbnailClassname()}
-        to={
-          isPathnamePlaylist
-            ? `/watch?v=${obj?.snippet?.resourceId?.videoId}`
-            : `/watch?v=${obj?.id?.videoId}`
-        }
-      >
-        <img
-          src={imgSrc ?? Loading}
-          alt="thumbnails"
-          className="video-thumbnail"
-        />
-      </Link>
+      {imageSection}
       <div className="d-flex meta-col">
         <div>
-          <Link
-            className="videos-title fw-bold cursor-pointer video-title-small"
-            to={
-              isPathnamePlaylist
-                ? `/watch?v=${obj?.snippet?.resourceId?.videoId}`
-                : `/watch?v=${obj?.id?.videoId}`
-            }
-          >
-            {obj?.snippet?.title}
-          </Link>
+          {titleSection}
           <div
             className={`text-secondary ${isPathnamePlaylist ? "d-flex" : ""}`}
           >
@@ -173,7 +198,6 @@ export default function VideoDetails() {
   const [descriptionLength, setDescriptionLength] = useState(false);
   const windowWidth = useWindowWidth();
   const navigate = useNavigate();
-  const [channelImgSrc, setChannelImgSrc] = useState("");
 
   const {
     data: videoData,
@@ -195,6 +219,17 @@ export default function VideoDetails() {
     queryFn: () => getChannelDetails(channelId),
     enabled: Boolean(channelId),
     retry: false,
+  });
+
+  const channelImageURL =
+    channelData?.data?.items?.[0]?.snippet?.thumbnails?.medium?.url;
+  const { data: channelImgSrc } = useQuery({
+    queryKey: ["image", channelImageURL],
+    queryFn: () => loadImage(channelImageURL),
+    enabled: Boolean(channelImageURL),
+    retry: false,
+    staleTime: 1000 * 60 * 60 * 24,
+    cacheTime: 1000 * 60 * 60 * 24,
   });
 
   const { data: suggestedVideosData } = useQuery({
@@ -241,7 +276,6 @@ export default function VideoDetails() {
     const items = channelData?.data?.items?.[0];
     if (!items) {
       setSubscriber("");
-      setChannelImgSrc("");
       return;
     }
 
@@ -249,9 +283,6 @@ export default function VideoDetails() {
     setSubscriber(
       subscribers > 999 ? roundSubsAndLikes(subscribers) : subscribers,
     );
-    loadImage(items?.snippet?.thumbnails?.medium?.url)
-      .then((resp) => setChannelImgSrc(resp))
-      .catch(() => setChannelImgSrc(""));
   }, [channelData]);
 
   useEffect(() => {
@@ -289,7 +320,7 @@ export default function VideoDetails() {
               >
                 <img
                   className="cursor-pointer rounded-circle channel-avatar2"
-                  src={channelImgSrc}
+                  src={channelImgSrc ?? ""}
                   alt="logo"
                 />
               </Link>
